@@ -1,0 +1,56 @@
+
+# comment
+
+stmt: simple_stmt | compound_stmt
+simple_stmt: small_stmt (';' small_stmt)* (NEWLINE | EOF)
+small_stmt: (expr_stmt | print_stmt  | flow_stmt)
+
+expr_stmt: targetlist augassign listmaker
+augassign: ('=' | '+=' | '-=' | '*=' | '/=' | '%=' | '&=' | '|=' | '^=')
+targetlist = target ("," target)* 
+target = NAME
+
+# For normal assignments, additional restrictions enforced by the interpreter
+print_stmt: 'print' ( test (',' test)* )
+flow_stmt: break_stmt | continue_stmt | return_stmt 
+break_stmt: 'break'
+continue_stmt: 'continue'
+return_stmt: 'return' test
+
+compound_stmt: if_stmt | while_stmt | for_stmt | funcdef | classdef
+if_stmt: 'if' test ':' suite ('elif' test ':' suite)* ['else' ':' suite]
+while_stmt: 'while' test ':' suite ['else' ':' suite]
+for_stmt: 'for' exprlist 'in' atom ':' suite ['else' ':' suite] |
+	  'for' exprlist 'in' 'range' '(' NUMBER ',' NUMBER ')' ':' suite ['else' ':' suite] 
+suite: simple_stmt | NEWLINE INDENT stmt+ (DEDENT | EOF)
+
+funcdef: 'def' NAME parameters ':' suite
+parameters: '(' [varargslist] ')'
+varargslist: ([fpdef ['=' test] (',' fpdef ['=' test])* ] )
+fpdef: NAME  | SELF | '(' fplist ')'
+fplist: fpdef (',' fpdef)* 
+
+classdef: 'class' NAME ['(' [atom [',' atom]* ] ')'] ':' suite
+
+test: or_test ['if' or_test 'else' test]
+or_test: and_test ('or' and_test)*
+and_test: not_test ('and' not_test)*
+not_test: 'not' not_test | comparison
+comparison: expr (comp_op expr)*
+comp_op: '<'|'>'|'=='|'>='|'<='|'<>'|'!='|'in'|'not' 'in'|'is'|'is' 'not'
+expr: xor_expr ('|' xor_expr)*
+xor_expr: and_expr ('^' and_expr)*
+and_expr: arith_expr ('&' arith_expr)*
+arith_expr: term (('+'|'-') term)*
+term: factor (('*'|'/'|'%'|'//') (('int'|'float') '(' arith_expr ')' | factor))*
+factor: ('+'|'-'|'~') factor | atom
+atom: [ '['listmaker']' ] | NAME | NUMBER | STRING+
+
+listmaker: test (',' test)* 
+
+# o primeiro uso de uma variável deve definir o seu tipo (sem tipagem dinâmica)
+# STRING:  ''' (?)* '''
+# NUMBER: int ou float
+# self é uma palavra-chave e deve ser tratado
+# não é necessário implementar property
+# não vamos trabalhar com herança
