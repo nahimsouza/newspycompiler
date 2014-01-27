@@ -54,3 +54,31 @@ listmaker: test (',' test)*
 # self é uma palavra-chave e deve ser tratado
 # não é necessário implementar property
 # não vamos trabalhar com herança
+
+
+=============================
+
+Análise Semântica:
+    1. Verificar se nome é uma palavra chave.
+        1.1 - funcao
+        1.2 - variavel
+        1.3 - classe
+    2. Primeiro uso da variavel define seu tipo.
+        2.1 - precisa ver se uma variavel ja foi declarada
+        2.2 - se a variavel ja foi declarada, nao pode associar com outro tipo
+        2.3 - se a variavel nao havia sido declarada, associar com o tipo
+    3. ver escopo dos nomes
+        3.1 - nao pode repetir nomes de variaveis dentro da mesma classe (local)
+        3.2 - nao pode repetir nomes de variaveis dentro da mesma funcao (local)
+        3.3 - nao pode repetir nomes de variaveis globais 
+        3.4 - nao pode repetir nome da classe
+    4. verificar tipos das variaveis nas operacoes
+        4.1 - nao pode somar/subtrair/mult/div/etc... um inteiro com uma string
+        4.2 - comparacoes só podem ser feitas com tipos iguais (algumas só com inteiros: >=, <=, etc)
+    5. verificar nomes invalidos de variaveis (por ex, comecando com numero: 3var = 2)
+
+
+
+*** precisa ver nos testes depois, se falta alguma analise semantica.
+        
+        

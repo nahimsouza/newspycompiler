@@ -1,3 +1,18 @@
+/**
+ * Lab de Compiladores - BCC, UFSCar, Sorocaba - 2013
+ *
+ * SPy Compiler
+ * Fernando Villas Boas Alves 
+ * Nahim Alves de Souza
+ *
+ * ====================================================
+ * 
+ * Classe Symbol: 
+ * Guarda a tabela de simbolos da linguagem SPy, 
+ * Os simbolos são representados por constantes inteiras.
+ * 
+ */
+
 package Lexer;
 
 public class Symbol {

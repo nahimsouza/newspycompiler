@@ -1,3 +1,17 @@
+/**
+ * Lab de Compiladores - BCC, UFSCar, Sorocaba - 2013
+ *
+ * SPy Compiler
+ * Fernando Villas Boas Alves 
+ * Nahim Alves de Souza
+ *
+ * ====================================================
+ * 
+ * Classe Lexer: 
+ * Contem as funcoes necessarias para a analise lexica, alem da tabela de palavras-chave.
+ * 
+ */
+
 package Lexer;
 
 import CompilerSPy.CompilerError;
@@ -5,21 +19,33 @@ import java.util.HashMap;
 
 public class Lexer {
 
-    /*
-     * Esta classe faz a análise léxica.
-     */
-    public Lexer(char[] input, CompilerError error) {
-        this.input = input;
-        // add an end-of-file label to make it easy to do the lexer
-        input[input.length - 1] = '\0';
-        // number of the current line
-        lineNumber = 1;
-        tokenPos = 0;
-        lastTokenPos = 0;
-        beforeLastTokenPos = 0;
-        this.error = error;
-    }
+    // ================= VARIAVEIS DA CLASSE ====================
+        
+    // current token
+    public int token;
+    
+    private String stringValue, literalStringValue;
+    private int numberValue;
+    private int tokenPos;
+    
+    //  input[lastTokenPos] is the last character of the last token found
+    private int lastTokenPos;
+    
+    //  input[beforeLastTokenPos] is the last character of the token before the last token found
+    private int beforeLastTokenPos;
+    
+    // program given as input - source code
+    private char[] input;
+    
+    // number of current line. Starts with 1
+    private int lineNumber;
+    
+    private CompilerError error;
+
+    private int indent, dedent, lastIndentCount, linhaIndent;
+    
     private static final int MaxValueInteger = 32767;
+    
     // contains the keywords
     private static final HashMap<String, Integer> keywordsTable;
 
@@ -45,30 +71,49 @@ public class Lexer {
         keywordsTable.put("is", Symbol.IS);
     }
 
+    // =========================================================
+    
+    public Lexer(char[] input, CompilerError error) {
+        this.input = input;
+
+        // add an end-of-file label to make it easy to do the lexer
+        input[input.length - 1] = '\0';
+
+        // number of the current line
+        lineNumber = 1;
+        tokenPos = 0;
+        lastTokenPos = 0;
+        beforeLastTokenPos = 0;
+        
+        // usados para o INDENT e DEDENT
+        linhaIndent = 0;
+        lastIndentCount = 0;
+        
+        this.error = error;
+    }
+
     public void nextToken() {
         char ch;
-        int indentCount = 0;
+        int indentCount = 0; // verifica a indentacao atual
 
         if (indent > 0) {
             token = Symbol.INDENT;
             indent = 0;
-
             return;
         }
+        
         if (dedent > 0) {
             token = Symbol.DEDENT;
-
             dedent--;
             return;
         }
 
-        //Atualiza Indent
+        // Atualiza Indent
         indentCount = lastIndentCount;
 
         // Pula os espacos em branco
         lastTokenPos = tokenPos;
-        while ((ch = input[tokenPos]) == ' ' || ch == '\r'
-                || ch == '\t' || ch == '\n') {
+        while ((ch = input[tokenPos]) == ' ' || ch == '\r' || ch == '\t' || ch == '\n') {
 
             // count the number of lines
             if (ch == '\n') {
@@ -77,7 +122,7 @@ public class Lexer {
                 lineNumber++;
             }
 
-            //verifica se é IDENT
+            //verifica se é INDENT
             if (ch == '\t' && linhaIndent == 0) {
                 indentCount++;
             }
@@ -371,21 +416,5 @@ public class Lexer {
     public String getLiteralStringValue() {
         return literalStringValue;
     }
-    // current token
-    public int token;
-    private String stringValue, literalStringValue;
-    private int numberValue;
-    private int tokenPos;
-    //  input[lastTokenPos] is the last character of the last token found
-    private int lastTokenPos;
-    //  input[beforeLastTokenPos] is the last character of the token before the last
-    // token found
-    private int beforeLastTokenPos;
-    // program given as input - source code
-    private char[] input;
-    // number of current line. Starts with 1
-    private int lineNumber;
-    private CompilerError error;
 
-    private int indent, dedent, lastIndentCount, linhaIndent;
 }
