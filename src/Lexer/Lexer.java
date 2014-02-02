@@ -1,17 +1,14 @@
 /**
  * Lab de Compiladores - BCC, UFSCar, Sorocaba - 2013
  *
- * SPy Compiler
- * Fernando Villas Boas Alves 
- * Nahim Alves de Souza
+ * SPy Compiler Fernando Villas Boas Alves Nahim Alves de Souza
  *
  * ====================================================
- * 
- * Classe Lexer (adaptada de Tomazella & Casadei):  
- * Contem as funcoes necessarias para a analise lexica, alem da tabela de palavras-chave.
- * 
+ *
+ * Classe Lexer (adaptada de Tomazella & Casadei): Contem as funcoes necessarias
+ * para a analise lexica, alem da tabela de palavras-chave.
+ *
  */
-
 package Lexer;
 
 import CompilerSPy.CompilerError;
@@ -20,32 +17,32 @@ import java.util.HashMap;
 public class Lexer {
 
     // ================= DECLARACAO DE VARIAVEIS ====================
-        
     // current token
     public int token;
-    
-    private String stringValue, literalStringValue;
+
+    private String stringValue;
+    // private String literalStringValue;
     private int numberValue;
     private int tokenPos;
-    
+
     //  input[lastTokenPos] is the last character of the last token found
     private int lastTokenPos;
-    
+
     //  input[beforeLastTokenPos] is the last character of the token before the last token found
     private int beforeLastTokenPos;
-    
+
     // program given as input - source code
     private char[] input;
-    
+
     // number of current line. Starts with 1
     private int lineNumber;
-    
+
     private CompilerError error;
 
     private int indent, dedent, lastIndentCount, linhaIndent;
-    
+
     private static final int MaxValueInteger = 32767;
-    
+
     // contains the keywords
     private static final HashMap<String, Integer> keywordsTable;
 
@@ -72,7 +69,6 @@ public class Lexer {
     }
 
     // =========================================================
-    
     public Lexer(char[] input, CompilerError error) {
         this.input = input;
 
@@ -84,11 +80,11 @@ public class Lexer {
         tokenPos = 0;
         lastTokenPos = 0;
         beforeLastTokenPos = 0;
-        
+
         // usados para o INDENT e DEDENT
         linhaIndent = 0;        // guarda 1 se a linha contem algum comando e 0 caso contrário
-        lastIndentCount = 0;    
-        
+        lastIndentCount = 0;
+
         this.error = error;
     }
 
@@ -103,62 +99,62 @@ public class Lexer {
         }
         return false;
     }
-    
-    public void nextToken(){
+
+    public void nextToken() {
         // Verifica se o codigo começa com um comentario
-        if (comment()){
+        if (comment()) {
             return;
         }
-        
+
         // Para tratar o INDENT e DEDENT
-        if (indent > 0){
+        if (indent > 0) {
             token = Symbol.INDENT;
             indent = 0;
             return;
-        }        
-        if (dedent > 0){
+        }
+        if (dedent > 0) {
             token = Symbol.DEDENT;
             dedent--;
             return;
         }
-        
+
         // indentCount eh usado para verificar a identacao atual
         int indentCount = lastIndentCount;
-        
+
         // Verifica os espacos em branco
         lastTokenPos = tokenPos;
         while ((tokenPos < input.length) && (input[tokenPos] == ' ' || input[tokenPos] == '\r' || input[tokenPos] == '\t' || input[tokenPos] == '\n')) {
-            
-            if(input[tokenPos] == '\n'){
+
+            if (input[tokenPos] == '\n') {
                 indentCount = 0; // zera o contador de indentacoes
-                if (linhaIndent == 1){
+                if (linhaIndent == 1) {
                     token = Symbol.NEWLINE;
                     linhaIndent = 0; // indica que a linha nao possui nenhum comando
                     return;
                 }
             }
-            
+
             // para contar se houve varios TABs seguidos
-            if (input[tokenPos] == '\t' && linhaIndent == 0){
+            if (input[tokenPos] == '\t' && linhaIndent == 0) {
                 indentCount++;
             }
-            
+
             tokenPos++;
         }
-        
+
         // Pode ser que tenha um comentario depois de varios espacos em branco
-        if (comment()){
+        if (comment()) {
             return;
         }
-        
+
         linhaIndent = 1; // indica que tem algum codigo depois dos espacos em branco
-        
+
         /* INDENT/DEDENT: 
-            - O IF verifica se eh um INDENT (1º caso) ou DEDENT(2º caso)
-            - Quando entra em uma das condicoes, conta quantos INDENTs ou DEDENTs foram acrescentados
-            - Chama nextToken(), que por sua vez, cai no primeiro IF (indent > 0) 
-            e retorna o Symbol.IDENT (de modo equivalente para o DEDENT)
-        */
+         - O IF verifica se eh um INDENT (1º caso) ou DEDENT(2º caso)
+         - Quando entra em uma das condicoes, conta quantos INDENTs ou DEDENTs foram acrescentados
+         - Chama nextToken(), que por sua vez, cai no primeiro IF (indent > 0) 
+         e retorna o Symbol.IDENT (de modo equivalente para o DEDENT)
+         */
         if (indentCount > lastIndentCount) {
             indent = indentCount - lastIndentCount;
             nextToken();
@@ -171,117 +167,55 @@ public class Lexer {
             return;
         }
         lastIndentCount = indentCount; // ( eh necessario ?)
-        
+
         // Verifica se eh fim do arquivo
-        if (input[tokenPos] == '\0'){
+        if (input[tokenPos] == '\0') {
             token = Symbol.EOF;
         } else {
-            // PAREI na linha 188 do Tomazella
-        }
-        
 
-        
-    }
-    
-    
-    public void oldNextToken() {
-        char ch;
-        int indentCount = 0; // verifica a indentacao atual
-
-        if (indent > 0) {
-            token = Symbol.INDENT;
-            indent = 0;
-            return;
-        }
-        
-        if (dedent > 0) {
-            token = Symbol.DEDENT;
-            dedent--;
-            return;
-        }
-
-        // Atualiza Indent
-        indentCount = lastIndentCount;
-
-        // Pula os espacos em branco
-        lastTokenPos = tokenPos;
-        while ((ch = input[tokenPos]) == ' ' || ch == '\r' || ch == '\t' || ch == '\n') {
-
-            // count the number of lines
-            if (ch == '\n') {
-//                indentCount = 0;
-//                linhaIndent = 0;
-                lineNumber++;
-            }
-
-            //verifica se é INDENT
-//            if (ch == '\t' && linhaIndent == 0) {
-//                indentCount++;
-//            }
-
-            tokenPos++;
-        }
-
-        linhaIndent = 1;
-
-        if (indentCount > lastIndentCount) {
-            indent = indentCount - lastIndentCount;
-            nextToken();
-            lastIndentCount = indentCount;
-            return;
-        } else if (indentCount < lastIndentCount) {
-            dedent = lastIndentCount - indentCount;
-            nextToken();
-            lastIndentCount = indentCount;
-            return;
-        }
-        lastIndentCount = indentCount;
-
-        if (ch == '\0') {
-            token = Symbol.EOF;
-        } else if (input[tokenPos] == '#') {
-            // pula os comentarios:
-            while (input[tokenPos] != '\n' && input[tokenPos] != '\0') {
-                tokenPos++;
-            }
-            nextToken();
-        } else {
-            if (Character.isLetter(ch)) {
-                // get an identifier or keyword
-                StringBuffer ident = new StringBuffer();
-                while (Character.isLetter(input[tokenPos])
-                        || Character.isDigit(input[tokenPos])) {
-                    ident.append(input[tokenPos]);
+            if (Character.isLetter(input[tokenPos]) || input[tokenPos] == '_') {
+                // identificador pode comecar com letra ou underscore, e pode ter digitos
+                String aux = "";
+                while (Character.isLetter(input[tokenPos]) || Character.isDigit(input[tokenPos]) || input[tokenPos] == '_') {
+                    aux += (input[tokenPos]);
                     tokenPos++;
                 }
-                stringValue = ident.toString();
+
                 // verifica se é uma palavra-chave
                 Object value = keywordsTable.get(stringValue);
                 if (value == null) {
                     // se nao for uma palavra-chave, significa que é uma variavel
                     token = Symbol.ID;
+                    stringValue = aux;
                 } else {
                     token = (Integer) value;
                 }
-            } else if (Character.isDigit(ch)) {
-                StringBuffer number = new StringBuffer();
+
+            } else if (Character.isDigit(input[tokenPos])) {
+                // caso encontre um numero
+                String number = "";
                 while (Character.isDigit(input[tokenPos])) {
-                    number.append(input[tokenPos]);
+                    number += input[tokenPos];
                     tokenPos++;
                 }
-                // encontrou um numero
+
+                // encontrou um numero verifica se eh um inteiro valido
                 token = Symbol.NUM;
                 try {
                     numberValue = Integer.valueOf(number.toString()).intValue();
                 } catch (NumberFormatException e) {
                     error.show("Number out of limits");
                 }
+
+                // MaxValueInteger = 32767 - nao tinha na especificacao, deixei pq ja tinha no codigo 
                 if (numberValue >= MaxValueInteger) {
                     error.show("Number out of limits");
                 }
             } else if (input[tokenPos] == '\'' || input[tokenPos] == '"') {
+                // caso encontre uma STRING (qqr texto entre aspas)
                 String aux = "";
-                char abre = input[tokenPos++];
+
+                char abre = input[tokenPos++]; // abre aspas pode ser ' ou "
                 while (input[tokenPos] != abre || (input[tokenPos] == abre && input[tokenPos - 1] == '\\')) {
                     aux += input[tokenPos];
                     tokenPos++;
@@ -289,8 +223,10 @@ public class Lexer {
                 tokenPos++;
                 token = Symbol.STRING;
                 stringValue = aux;
-
             } else {
+                // switch case para os demais simbolos
+
+                char ch = input[tokenPos]; // apenas para facilitar
                 tokenPos++;
                 switch (ch) {
                     case '+':
@@ -505,8 +441,7 @@ public class Lexer {
         return numberValue;
     }
 
-    public String getLiteralStringValue() {
-        return literalStringValue;
-    }
-
+//    public String getLiteralStringValue() {
+//        return literalStringValue;
+//    }
 }

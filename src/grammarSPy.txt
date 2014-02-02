@@ -67,6 +67,9 @@ $ importante: estamos considerando apenas '\t' como indentacao
 
 $ Por que tinha mudado isso?? >> term: factor (('*'|'/'|'%'|'//') (('int'|'float') '(' arith_expr ')' | factor))*
 
+$ consideramos numeros com valor maximo 32767, apenas pq já tinha isso no codigo
+
+$ conferir depois no Lexer, pois esta considerando apenas o NEQC '!=', conferir se nao dá erro qndo tem algo '!true' por exemplo
 
 =====================================================
 
