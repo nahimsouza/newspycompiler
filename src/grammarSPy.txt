@@ -2,7 +2,7 @@
 # comment
 
 stmt: simple_stmt | compound_stmt
-simple_stmt: small_stmt (';' small_stmt)* (NEWLINE | EOF)
+simple_stmt: small_stmt (';' small_stmt)* NEWLINE
 small_stmt: (expr_stmt | print_stmt  | flow_stmt)
 
 expr_stmt: targetlist augassign listmaker
@@ -22,12 +22,12 @@ if_stmt: 'if' test ':' suite ('elif' test ':' suite)* ['else' ':' suite]
 while_stmt: 'while' test ':' suite ['else' ':' suite]
 for_stmt: 'for' exprlist 'in' atom ':' suite ['else' ':' suite] |
 	  'for' exprlist 'in' 'range' '(' NUMBER ',' NUMBER ')' ':' suite ['else' ':' suite] 
-suite: simple_stmt | NEWLINE INDENT stmt+ (DEDENT | EOF)
+suite: simple_stmt | NEWLINE INDENT stmt+ DEDENT
 
 funcdef: 'def' NAME parameters ':' suite
 parameters: '(' [varargslist] ')'
 varargslist: ([fpdef ['=' test] (',' fpdef ['=' test])* ] )
-fpdef: NAME  | SELF | '(' fplist ')'
+fpdef: NAME | '(' fplist ')'
 fplist: fpdef (',' fpdef)* 
 
 classdef: 'class' NAME ['(' [atom [',' atom]* ] ')'] ':' suite
@@ -42,21 +42,33 @@ expr: xor_expr ('|' xor_expr)*
 xor_expr: and_expr ('^' and_expr)*
 and_expr: arith_expr ('&' arith_expr)*
 arith_expr: term (('+'|'-') term)*
-term: factor (('*'|'/'|'%'|'//') (('int'|'float') '(' arith_expr ')' | factor))*
+term: factor (('*'|'/'|'%'|'//') factor)*
 factor: ('+'|'-'|'~') factor | atom
-atom: [ '['listmaker']' ] | NAME | NUMBER | STRING+
+atom: '[' [listmaker] ']' | NAME | NUMBER | STRING+
 
 listmaker: test (',' test)* 
 
+
+
+
 # o primeiro uso de uma variável deve definir o seu tipo (sem tipagem dinâmica)
-# STRING:  ''' (?)* '''
+# STRING:  ''' (?)* ''' >> STRING eh qualquer caractere entre aspas ("") ou aspas simples('')
 # NUMBER: int ou float
 # self é uma palavra-chave e deve ser tratado
 # não é necessário implementar property
 # não vamos trabalhar com herança
 
+====================================================
 
-=============================
+$ quando tiver NEWLINE na gramática, talvez seja melhor considerar NEWLINE+ 
+para nao ter problema com INDENT/DEDENT OU tratar no Lexer(??)
+
+$ importante: estamos considerando apenas '\t' como indentacao
+
+$ Por que tinha mudado isso?? >> term: factor (('*'|'/'|'%'|'//') (('int'|'float') '(' arith_expr ')' | factor))*
+
+
+=====================================================
 
 Análise Semântica:
     1. Verificar se nome é uma palavra chave.

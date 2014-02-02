@@ -7,7 +7,7 @@
  *
  * ====================================================
  * 
- * Classe Lexer: 
+ * Classe Lexer (adaptada de Tomazella & Casadei):  
  * Contem as funcoes necessarias para a analise lexica, alem da tabela de palavras-chave.
  * 
  */
@@ -19,7 +19,7 @@ import java.util.HashMap;
 
 public class Lexer {
 
-    // ================= VARIAVEIS DA CLASSE ====================
+    // ================= DECLARACAO DE VARIAVEIS ====================
         
     // current token
     public int token;
@@ -86,13 +86,105 @@ public class Lexer {
         beforeLastTokenPos = 0;
         
         // usados para o INDENT e DEDENT
-        linhaIndent = 0;
-        lastIndentCount = 0;
+        linhaIndent = 0;        // guarda 1 se a linha contem algum comando e 0 caso contrário
+        lastIndentCount = 0;    
         
         this.error = error;
     }
 
-    public void nextToken() {
+    public boolean comment() {
+        if (input[tokenPos] == '#') {
+            // enquanto tiver '\n' e nao tiver chegado no fim do arquivo
+            while (input[tokenPos] != '\n' && tokenPos < (input.length - 1)) {
+                tokenPos++;
+            }
+            nextToken();
+            return true;
+        }
+        return false;
+    }
+    
+    public void nextToken(){
+        // Verifica se o codigo começa com um comentario
+        if (comment()){
+            return;
+        }
+        
+        // Para tratar o INDENT e DEDENT
+        if (indent > 0){
+            token = Symbol.INDENT;
+            indent = 0;
+            return;
+        }        
+        if (dedent > 0){
+            token = Symbol.DEDENT;
+            dedent--;
+            return;
+        }
+        
+        // indentCount eh usado para verificar a identacao atual
+        int indentCount = lastIndentCount;
+        
+        // Verifica os espacos em branco
+        lastTokenPos = tokenPos;
+        while ((tokenPos < input.length) && (input[tokenPos] == ' ' || input[tokenPos] == '\r' || input[tokenPos] == '\t' || input[tokenPos] == '\n')) {
+            
+            if(input[tokenPos] == '\n'){
+                indentCount = 0; // zera o contador de indentacoes
+                if (linhaIndent == 1){
+                    token = Symbol.NEWLINE;
+                    linhaIndent = 0; // indica que a linha nao possui nenhum comando
+                    return;
+                }
+            }
+            
+            // para contar se houve varios TABs seguidos
+            if (input[tokenPos] == '\t' && linhaIndent == 0){
+                indentCount++;
+            }
+            
+            tokenPos++;
+        }
+        
+        // Pode ser que tenha um comentario depois de varios espacos em branco
+        if (comment()){
+            return;
+        }
+        
+        linhaIndent = 1; // indica que tem algum codigo depois dos espacos em branco
+        
+        /* INDENT/DEDENT: 
+            - O IF verifica se eh um INDENT (1º caso) ou DEDENT(2º caso)
+            - Quando entra em uma das condicoes, conta quantos INDENTs ou DEDENTs foram acrescentados
+            - Chama nextToken(), que por sua vez, cai no primeiro IF (indent > 0) 
+            e retorna o Symbol.IDENT (de modo equivalente para o DEDENT)
+        */
+        if (indentCount > lastIndentCount) {
+            indent = indentCount - lastIndentCount;
+            nextToken();
+            lastIndentCount = indentCount;
+            return;
+        } else if (indentCount < lastIndentCount) {
+            dedent = lastIndentCount - indentCount;
+            nextToken();
+            lastIndentCount = indentCount;
+            return;
+        }
+        lastIndentCount = indentCount; // ( eh necessario ?)
+        
+        // Verifica se eh fim do arquivo
+        if (input[tokenPos] == '\0'){
+            token = Symbol.EOF;
+        } else {
+            // PAREI na linha 188 do Tomazella
+        }
+        
+
+        
+    }
+    
+    
+    public void oldNextToken() {
         char ch;
         int indentCount = 0; // verifica a indentacao atual
 
@@ -117,15 +209,15 @@ public class Lexer {
 
             // count the number of lines
             if (ch == '\n') {
-                indentCount = 0;
-                linhaIndent = 0;
+//                indentCount = 0;
+//                linhaIndent = 0;
                 lineNumber++;
             }
 
             //verifica se é INDENT
-            if (ch == '\t' && linhaIndent == 0) {
-                indentCount++;
-            }
+//            if (ch == '\t' && linhaIndent == 0) {
+//                indentCount++;
+//            }
 
             tokenPos++;
         }
