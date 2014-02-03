@@ -67,7 +67,7 @@ public class Compiler {
 
     private SimpleStmt simple_stmt() {
         /*
-         * simple_stmt: small_stmt (';' small_stmt)* (NEWLINE | EOF)
+         * simple_stmt: small_stmt (';' small_stmt)* NEWLINE
          */
 
         SimpleStmt stmt = new SimpleStmt();
@@ -482,7 +482,7 @@ public class Compiler {
 
     private Suite suite() {
         /*
-         * suite: simple_stmt | NEWLINE INDENT stmt+ (DEDENT | EOF)
+         * suite: simple_stmt | NEWLINE INDENT stmt+ DEDENT
          */
 
         Suite suite = new Suite();
@@ -902,8 +902,8 @@ public class Compiler {
 
     private Term term() {
         /*
-         * OLD -> term: factor (('*'|'/'|'%'|'//') factor)*
-         * NEW -> term: factor (('*'|'/'|'%'|'//') (('int'|'float') '(' arith_expr ')' | factor))*
+         * ORIGINAL -> term: factor (('*'|'/'|'%'|'//') factor)*
+         * MUDADO Pq?? -> term: factor (('*'|'/'|'%'|'//') (('int'|'float') '(' arith_expr ')' | factor))*
          * 
          */
 
@@ -1056,62 +1056,5 @@ public class Compiler {
     private SymbolTable symbolTable;
     private Lexer lexer;
     private CompilerError error;
-   
-   
-   /*
-    stmt: simple_stmt | compound_stmt
-    simple_stmt: small_stmt (';' small_stmt)* NEWLINE
-    small_stmt: (expr_stmt | print_stmt  | flow_stmt)
-
-    expr_stmt: targetlist augassign listmaker
-    augassign: ('=' | '+=' | '-=' | '*=' | '/=' | '%=' | '&=' | '|=' | '^=')
-    targetlist = target ("," target)* 
-    target = NAME
-
-    # For normal assignments, additional restrictions enforced by the interpreter
-    print_stmt: 'print' ( test (',' test)* )
-    flow_stmt: break_stmt | continue_stmt | return_stmt 
-    break_stmt: 'break'
-    continue_stmt: 'continue'
-    return_stmt: 'return' test
-
-    compound_stmt: if_stmt | while_stmt | for_stmt | funcdef | classdef
-    if_stmt: 'if' test ':' suite ('elif' test ':' suite)* ['else' ':' suite]
-    while_stmt: 'while' test ':' suite ['else' ':' suite]
-    for_stmt: 'for' exprlist 'in' atom ':' suite ['else' ':' suite] |
-              'for' exprlist 'in' 'range' '(' NUMBER ',' NUMBER ')' ':' suite ['else' ':' suite] 
-    suite: simple_stmt | NEWLINE INDENT stmt+ DEDENT
-
-    funcdef: 'def' NAME parameters ':' suite
-    parameters: '(' [varargslist] ')'
-    varargslist: ([fpdef ['=' test] (',' fpdef ['=' test])* ] )
-    fpdef: NAME | '(' fplist ')'
-    fplist: fpdef (',' fpdef)* 
-
-    classdef: 'class' NAME ['(' [atom [',' atom]* ] ')'] ':' suite
-
-    test: or_test ['if' or_test 'else' test]
-    or_test: and_test ('or' and_test)*
-    and_test: not_test ('and' not_test)*
-    not_test: 'not' not_test | comparison
-    comparison: expr (comp_op expr)*
-    comp_op: '<'|'>'|'=='|'>='|'<='|'<>'|'!='|'in'|'not' 'in'|'is'|'is' 'not'
-    expr: xor_expr ('|' xor_expr)*
-    xor_expr: and_expr ('^' and_expr)*
-    and_expr: arith_expr ('&' arith_expr)*
-    arith_expr: term (('+'|'-') term)*
-    term: factor (('*'|'/'|'%'|'//') factor)*
-    factor: ('+'|'-'|'~') factor | atom
-    atom: '[' [listmaker] ']' | NAME | NUMBER | STRING+
-
-    listmaker: test (',' test)* 
-
-
-   */
-    
-    
-   private SymbolTable symbolTable;
-   private Lexer lexer;
-   private CompilerError error;
    
 }
