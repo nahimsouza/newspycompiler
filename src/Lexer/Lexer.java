@@ -1,12 +1,15 @@
 /**
  * Lab de Compiladores - BCC, UFSCar, Sorocaba - 2013
  *
- * SPy Compiler Fernando Villas Boas Alves Nahim Alves de Souza
+ * SPy Compiler 
+ * Fernando Villas Boas Alves 
+ * Nahim Alves de Souza
  *
  * ====================================================
  *
- * Classe Lexer (adaptada de Tomazella & Casadei): Contem as funcoes necessarias
- * para a analise lexica, alem da tabela de palavras-chave.
+ * Classe Lexer (adaptada de Tomazella & Casadei): 
+ *  Contem as funcoes necessarias para a analise lexica, 
+ *  alem da tabela de palavras-chave.
  *
  */
 package Lexer;
