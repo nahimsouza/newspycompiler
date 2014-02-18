@@ -20,8 +20,13 @@ return_stmt: 'return' test
 compound_stmt: if_stmt | while_stmt | for_stmt | funcdef | classdef
 if_stmt: 'if' test ':' suite ('elif' test ':' suite)* ['else' ':' suite]
 while_stmt: 'while' test ':' suite ['else' ':' suite]
-for_stmt: 'for' exprlist 'in' atom ':' suite ['else' ':' suite] |
-	  'for' exprlist 'in' 'range' '(' NUMBER ',' NUMBER ')' ':' suite ['else' ':' suite] 
+
+OLD: for_stmt: 'for' exprlist 'in' atom ':' suite ['else' ':' suite] |
+	       'for' exprlist 'in' 'range' '(' NUMBER ',' NUMBER ')' ':' suite ['else' ':' suite] 
+
+NEW: for_stmt: 'for' NAME 'in' atom ':' suite ['else' ':' suite] |
+	       'for' NAME 'in' 'range' '(' NUMBER ',' NUMBER ')' ':' suite ['else' ':' suite] 
+
 suite: simple_stmt | NEWLINE INDENT stmt+ DEDENT
 
 funcdef: 'def' NAME parameters ':' suite
@@ -60,16 +65,29 @@ listmaker: test (',' test)*
 
 ====================================================
 
-$ quando tiver NEWLINE na gramática, talvez seja melhor considerar NEWLINE+ 
-para nao ter problema com INDENT/DEDENT OU tratar no Lexer(??)
-
 $ importante: estamos considerando apenas '\t' como indentacao
+
+$ as alteracoes na gramatica estao indicadas por OLD/NEW
 
 $ Por que tinha mudado isso?? >> term: factor (('*'|'/'|'%'|'//') (('int'|'float') '(' arith_expr ')' | factor))*
 
 $ consideramos numeros com valor maximo 32767, apenas pq já tinha isso no codigo
 
 $ conferir depois no Lexer, pois esta considerando apenas o NEQC '!=', conferir se nao dá erro qndo tem algo '!true' por exemplo
+
+$ no for_stmt, consideramos 'exprlist' como uma variável (NAME), pois em python 
+as expressoes sempre sao do tipo: 'for x in range()', onde x sempre é uma variavel.
+(obs: já está alterado na gramatica)
+
+$ obs GenC: o código que está no GenC é o codigo do Tomazella, precisa conferir e alterar o que for necessário
+
+$ obs NAME: Tomazella criou uma classe para Name, não entendi muito bem o por quê, mas criei também pois pode ser útil depois.
+
+$ pensei em substituir a lista de Tests no PrintStmt por um listmaker, mas achei que daria problema no genC.
+
+$ em Factor, na AST, o operador ESTAVA sendo guardado como int, coloquei String apenas para padronizar (ver se nao vai dar erro)
+
+$ na classe Atom, o que tinhamos feito antes estava bem diferente, segui desta vez o modelo do Tomazella, talvez fique melhor no genC.
 
 =====================================================
 

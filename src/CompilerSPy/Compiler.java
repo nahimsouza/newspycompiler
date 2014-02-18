@@ -1,50 +1,47 @@
 package CompilerSPy;
+
 import AST.*;
 import Lexer.*;
 import java.io.PrintWriter;
 
-
 public class Compiler {
-    
+
     // compile must receive an input with an character less than 
     // p_input.lenght  
-    public Program compile( char []input, PrintWriter outError ) {
-        
-       symbolTable = new SymbolTable();
-       error = new CompilerError( lexer, new PrintWriter(outError) );
-       lexer = new Lexer(input, error);
-       error.setLexer(lexer);
-        
-        
-       Program p = null;
-       try {
-          lexer.nextToken();
-	  System.out.print(" " + lexer.token + " ");
-          if ( lexer.token == Symbol.EOF )
-             error.show("Unexpected EOF");
-          p = program();
-          if ( lexer.token != Symbol.EOF ) {
-             p = null;
-             error.show("EOF expected");
-          }
-       } catch ( Exception e ) {
-              // the below statement prints the stack of called methods.
-              // of course, it should be removed if the compiler were 
-              // a production compiler.
+    public Program compile(char[] input, PrintWriter outError) {
+
+        symbolTable = new SymbolTable();
+        error = new CompilerError(lexer, new PrintWriter(outError));
+        lexer = new Lexer(input, error);
+        error.setLexer(lexer);
+
+        Program p = null;
+        try {
+            lexer.nextToken();
+            System.out.print(" " + lexer.token + " ");
+            if (lexer.token == Symbol.EOF) {
+                error.show("Unexpected EOF");
+            }
+            p = program();
+            if (lexer.token != Symbol.EOF) {
+                p = null;
+                error.show("EOF expected");
+            }
+        } catch (Exception e) {
+            // the below statement prints the stack of called methods.
+            // of course, it should be removed if the compiler were 
+            // a production compiler.
             e.printStackTrace();
-          p = null;
-       }
-       
-       return p;   
-   }
-    
+            p = null;
+        }
+
+        return p;
+    }
+
     private Program program() {
-
         Program program = new Program();
-        Stmt stmt = new Stmt();
-
-        stmt = stmt();
-        program.addStmt(stmt);
+        Stmt stmt = stmt();
+        program.setStmt(stmt);
         return program;
     }
 
@@ -53,7 +50,7 @@ public class Compiler {
          * stmt: simple_stmt | compound_stmt
          */
 
-        Stmt stmt = new Stmt();
+        Stmt stmt = null;
 
         // considerando que NAME � um identificador Symbol.ID
 //        if (matchTokens(Symbol.ID, Symbol.PRINT, Symbol.BREAK, Symbol.CONTINUE, Symbol.RETURN)) {
@@ -61,7 +58,6 @@ public class Compiler {
 //        } else {
 //            stmt = compound_stmt();
 //        }
-
         return stmt;
     }
 
@@ -98,7 +94,7 @@ public class Compiler {
          * small_stmt: (expr_stmt | print_stmt | flow_stmt)
          */
 
-        SmallStmt stmt = new SmallStmt();
+        SmallStmt stmt = null;
 
 //        // considerando NAME = Symbol.ID
 //        if (matchTokens(Symbol.ID)) {
@@ -108,7 +104,6 @@ public class Compiler {
 //        } else {
 //            stmt = flow_stmt();
 //        }
-
         return stmt;
 
     }
@@ -116,15 +111,29 @@ public class Compiler {
     private ExprStmt expr_stmt() {
         /*
          * expr_stmt: targetlist augassign listmaker
+         */
+
+        ExprStmt es = new ExprStmt();
+
+//        es.setTargetList(targetlist());
+//        es.setAugassign(augassign());
+//        es.setListmaker(listmaker());
+//  
+        return es;
+    }
+
+    private Augassign augassign() {
+        /*
+         * expr_stmt: targetlist augassign listmaker
          *
          * augassign: ('=' | '+=' | '-=' | '*=' | '/=' | '%=' | '&=' | '|=' |
          * '^=')
          */
 
-        ExprStmt es = new ExprStmt();
-        
-//        es.setTargetList(targetlist());
-//        String op;
+        String op = null;
+        Augassign a = new Augassign(op);
+
+
 //
 //        if (matchTokens(Symbol.ASSIGN, Symbol.PLUSASSIGN, Symbol.MINUSASSIGN,
 //                Symbol.MULTIASSIGN, Symbol.DIVASSIGN, Symbol.MODASSIGN, Symbol.ANDASSIGN,
@@ -150,17 +159,14 @@ public class Compiler {
 //                op = "^=";
 //            }
 //
-//            Augassign a = new Augassign(op);
-//            es.setAugassign(a);
-//
+//      
 //            lexer.nextToken();
-//            es.setListmaker(listmaker());
-//        } else {
+//          } else {
 //            error.show("ASSIGN expected");
 //            lexer.nextToken();
-//        }
+//          }
+        return a;
 
-        return es;
     }
 
     private Targetlist targetlist() {
@@ -168,14 +174,13 @@ public class Compiler {
          * targetlist = target ("," target)*
          */
         Targetlist targetList = new Targetlist();
-        
+
 //        targetList.addTarget(target());
 //
 //        while (matchTokens(Symbol.COMMA)) {
 //            lexer.nextToken();
 //            targetList.addTarget(target());
 //        }
-
         return targetList;
     }
 
@@ -198,7 +203,6 @@ public class Compiler {
 //            error.show("NAME expected");
 //            lexer.nextToken();
 //        }
-
         return target;
     }
 
@@ -220,7 +224,6 @@ public class Compiler {
 //            }
 //
 //        }
-
         return print;
     }
 
@@ -235,7 +238,7 @@ public class Compiler {
          *
          */
 
-        FlowStmt flow = new FlowStmt();
+        FlowStmt flow = null;
 
 //        if (matchTokens(Symbol.BREAK)) {
 //            lexer.nextToken();
@@ -254,7 +257,6 @@ public class Compiler {
 //            error.show("FLOW STATEMENT expected");
 //            lexer.nextToken();
 //        }
-
         return flow;
     }
 
@@ -263,7 +265,7 @@ public class Compiler {
          * compound_stmt: if_stmt | while_stmt | for_stmt | funcdef | classdef
          */
 
-        Stmt stmt = new Stmt();
+        Stmt stmt = null;
 
 //        if (matchTokens(Symbol.IF)) {
 //            stmt.setIfStmt(if_stmt());
@@ -279,7 +281,6 @@ public class Compiler {
 //            error.show("STATEMENT expected");
 //            lexer.nextToken();
 //        }
-
         return stmt;
     }
 
@@ -330,7 +331,6 @@ public class Compiler {
 //                }
 //            }
 //        }
-
         return ifStmt;
     }
 
@@ -367,18 +367,17 @@ public class Compiler {
 //                }
 //            }
 //        }
-
         return whileStmt;
     }
 
     private ForStmt for_stmt() {
         /*
-         * for_stmt: 'for' exprlist 'in' atom ':' suite ['else' ':' suite] |
-         * 'for' exprlist 'in' 'range' '(' NUMBER ',' NUMBER ')' ':' suite ['else' ':' suite]
+         * for_stmt: 'for' NAME 'in' atom ':' suite ['else' ':' suite] |
+         * 'for' NAME 'in' 'range' '(' NUMBER ',' NUMBER ')' ':' suite ['else' ':' suite]
          */
 
         ForStmt forStmt = new ForStmt();
-        
+
 //        Exprlist exprList = new Exprlist();
 //
 //        if (matchTokens(Symbol.FOR)) {
@@ -476,7 +475,6 @@ public class Compiler {
 //            error.show("FOR expected");
 //            lexer.nextToken();
 //        }
-
         return forStmt;
     }
 
@@ -512,7 +510,6 @@ public class Compiler {
 //            suite.setSimpleStmt(true);
 //            suite.setSimplestmt(simple_stmt());
 //        }
-        
         return suite;
     }
 
@@ -552,7 +549,6 @@ public class Compiler {
 //            error.show("DEF expected");
 //            lexer.nextToken();
 //        }
-
         return func;
     }
 
@@ -577,7 +573,6 @@ public class Compiler {
 //            error.show("( expected");
 //            lexer.nextToken();
 //        }
-
         return param;
     }
 
@@ -604,7 +599,6 @@ public class Compiler {
 //                var.addTest(test());
 //            }
 //        }
-
         return var;
     }
 
@@ -639,7 +633,6 @@ public class Compiler {
 //            error.show("NAME or ( expected");
 //            lexer.nextToken();
 //        }
-
         return f;
     }
 
@@ -656,7 +649,6 @@ public class Compiler {
 //            lexer.nextToken();
 //            f.addFpdef(fpdef());
 //        }
-
         return f;
     }
 
@@ -664,9 +656,9 @@ public class Compiler {
         /*
          * classdef: 'class' NAME ['(' [atom [',' atom]* ] ')'] ':' suite
          */
-        
+
         ClassDef classDef = new ClassDef();
-        
+
 //        if (matchTokens(Symbol.CLASS)) {
 //            lexer.nextToken();
 //
@@ -710,7 +702,6 @@ public class Compiler {
 //            error.show("class expected");
 //            lexer.nextToken();
 //        }
-
         return classDef;
     }
 
@@ -720,7 +711,7 @@ public class Compiler {
          */
 
         Test test = new Test();
-        
+
 //        test.setOrtest(or_test());
 //
 //        if (matchTokens(Symbol.IF)) {
@@ -733,7 +724,6 @@ public class Compiler {
 //
 //            test.setElsetest(test());
 //        }
-
         return test;
     }
 
@@ -750,7 +740,6 @@ public class Compiler {
 //            lexer.nextToken();
 //            orTest.addAndTest(and_test());
 //        }
-
         return orTest;
     }
 
@@ -760,14 +749,13 @@ public class Compiler {
          */
 
         AndTest andTest = new AndTest();
-        
+
 //        andTest.addNotTest(not_test());
 //
 //        if (matchTokens(Symbol.AND)) {
 //            lexer.nextToken();
 //            andTest.addNotTest(not_test());
 //        }
-
         return andTest;
     }
 
@@ -777,14 +765,13 @@ public class Compiler {
          */
 
         NotTest notTest = new NotTest();
-        
+
 //        if (matchTokens(Symbol.NOT)) {
 //            lexer.nextToken();
 //            notTest.setNotTest(not_test());
 //        } else {
 //            notTest.setComparison(comparison());
 //        }
-
         return notTest;
     }
 
@@ -796,7 +783,7 @@ public class Compiler {
          */
 
         Comparison comparison = new Comparison();
-        
+
 //        comparison.setExpr(expr());
 //
 //        String op;
@@ -837,7 +824,6 @@ public class Compiler {
 ////            error.show("compOp expected");
 ////            lexer.nextToken();
 ////        }
-
         return comparison;
     }
 
@@ -847,14 +833,13 @@ public class Compiler {
          */
 
         Expr expr = new Expr();
-        
+
 //        expr.addXorExpr(xor_expr());
 //
 //        while (matchTokens(Symbol.ORBAR)) {
 //            lexer.nextToken();
 //            expr.addXorExpr(xor_expr());
 //        }
-
         return expr;
     }
 
@@ -874,7 +859,6 @@ public class Compiler {
 //            lexer.nextToken();
 //            xor.addArithExpr(arith_expr());
 //        }
-
         return xor;
     }
 
@@ -884,7 +868,7 @@ public class Compiler {
          */
 
         ArithExpr arith = new ArithExpr();
-        
+
 //        arith.setTerm(term());
 //
 //        while (matchTokens(Symbol.PLUS) || matchTokens(Symbol.MINUS)) {
@@ -896,7 +880,6 @@ public class Compiler {
 //            lexer.nextToken();
 //            arith.addTerm(term());
 //        }
-
         return arith;
     }
 
@@ -908,7 +891,7 @@ public class Compiler {
          */
 
         Term term = new Term();
-        
+
 //        String op;
 //        term.setFactor(factor());
 //
@@ -941,7 +924,6 @@ public class Compiler {
 //            }else
 //                term.addFactor(factor());
 //        }
-
         return term;
     }
 
@@ -961,7 +943,6 @@ public class Compiler {
 //            factor.setAtom(atom());
 //            factor.setFactor(false);
 //        }
-
         return factor;
     }
 
@@ -1023,7 +1004,6 @@ public class Compiler {
 //            error.show("Atom Error");
 //            lexer.nextToken();
 //        }
-
         return atom;
     }
 
@@ -1040,7 +1020,6 @@ public class Compiler {
 //            lexer.nextToken();
 //            listmaker.addTest(test());
 //        }
-
         return listmaker;
     }
 
@@ -1056,5 +1035,5 @@ public class Compiler {
     private SymbolTable symbolTable;
     private Lexer lexer;
     private CompilerError error;
-   
+
 }
