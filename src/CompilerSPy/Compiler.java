@@ -652,12 +652,12 @@ public class Compiler {
         return f;
     }
 
-    private ClassDef classdef() {
+    private Classdef classdef() {
         /*
          * classdef: 'class' NAME ['(' [atom [',' atom]* ] ')'] ':' suite
          */
 
-        ClassDef classDef = new ClassDef();
+        Classdef classDef = new Classdef();
 
 //        if (matchTokens(Symbol.CLASS)) {
 //            lexer.nextToken();
@@ -1027,7 +1027,7 @@ public class Compiler {
         for (int s : a) {
             if (lexer.token == s) {
                 return true;
-            }
+            } 
         }
         return false;
     }

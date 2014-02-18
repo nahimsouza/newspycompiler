@@ -89,9 +89,11 @@ $ em Factor, na AST, o operador ESTAVA sendo guardado como int, coloquei String 
 
 $ na classe Atom, o que tinhamos feito antes estava bem diferente, segui desta vez o modelo do Tomazella, talvez fique melhor no genC.
 
+$ obs: no forStmt achei melhor nao usar PyNumber, coloquei os NUMBERS como int mesmo.
+
 =====================================================
 
-Análise Semântica:
+Análise Semântica (TO DO):
     1. Verificar se nome é uma palavra chave.
         1.1 - funcao
         1.2 - variavel
