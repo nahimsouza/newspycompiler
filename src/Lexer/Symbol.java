@@ -18,7 +18,7 @@ package Lexer;
 public class Symbol {
 
     public final static int EOF = 0,
-            ID = 1,
+            NAME = 1,
             NUM = 2,
             PLUS = 3,
             MINUS = 4,

@@ -4,16 +4,7 @@
 package AST;
 
 public class WhileStmt extends CompoundStmt {
-
-    public WhileStmt(Test test, Suite suite) {
-        this.test = test;
-        this.suite = suite;
-    }
-
-    public WhileStmt() {
-
-    }
-
+    
     public Test getTest() {
         return test;
     }

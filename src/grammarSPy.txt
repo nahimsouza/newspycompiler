@@ -91,6 +91,10 @@ $ na classe Atom, o que tinhamos feito antes estava bem diferente, segui desta v
 
 $ obs: no forStmt achei melhor nao usar PyNumber, coloquei os NUMBERS como int mesmo.
 
+$ coloquei como 'error.show("Unexpected error in ...")' nos erros que NAO DEVEM acontecer (se acontecer, está com erro no código).
+
+$ ver se eh necessario todos os 'return null' quando acontece um erro.
+
 =====================================================
 
 Análise Semântica (TO DO):

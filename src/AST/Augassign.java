@@ -25,7 +25,7 @@ public class Augassign {
 //            tabs--;
 //        }
 //        System.out.println(x + this.getClass().getName());
-//        System.out.println(x + "  " + op.toString());
+//        System.out.println(x + "  " + op);
     }
 
     private String op;

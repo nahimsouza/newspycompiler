@@ -156,7 +156,7 @@ public class Lexer {
          - O IF verifica se eh um INDENT (1º caso) ou DEDENT(2º caso)
          - Quando entra em uma das condicoes, conta quantos INDENTs ou DEDENTs foram acrescentados
          - Chama nextToken(), que por sua vez, cai no primeiro IF (indent > 0) 
-         e retorna o Symbol.IDENT (de modo equivalente para o DEDENT)
+         e retorna o Symbol.INDENT (de modo equivalente para o DEDENT)
          */
         if (indentCount > lastIndentCount) {
             indent = indentCount - lastIndentCount;
@@ -188,7 +188,7 @@ public class Lexer {
                 Object value = keywordsTable.get(stringValue);
                 if (value == null) {
                     // se nao for uma palavra-chave, significa que é uma variavel
-                    token = Symbol.ID;
+                    token = Symbol.NAME;
                     stringValue = aux;
                 } else {
                     token = (Integer) value;
