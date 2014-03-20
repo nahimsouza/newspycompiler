@@ -47,7 +47,6 @@ public class Atom {
     public void setToName() {
         tipo = "name";
     }
-
     
     // Apenas armazena em tipo o que esta sendo guardado no Atom.
     public void setToListmaker() {

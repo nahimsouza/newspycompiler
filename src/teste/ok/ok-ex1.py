@@ -3,7 +3,7 @@ class A:
 	def m(self):
 		print ' 6 '
 		print ' %d ' % 1
-		print ' %d ' % int (1 + 1)
+		#print ' %d ' % int (1 + 1)
 		d = 4 - 1
 		print ' %d ' % d
 		d = (6-3) + 1

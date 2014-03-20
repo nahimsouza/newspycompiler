@@ -31,8 +31,13 @@ suite: simple_stmt | NEWLINE INDENT stmt+ DEDENT
 
 funcdef: 'def' NAME parameters ':' suite
 parameters: '(' [varargslist] ')'
-varargslist: ([fpdef ['=' test] (',' fpdef ['=' test])* ] )
-fpdef: NAME | '(' fplist ')'
+
+OLD: varargslist: ([fpdef ['=' test] (',' fpdef ['=' test])* ] )
+NEW: varargslist: fpdef ['=' test] (',' fpdef ['=' test])*   --> apenas tirei a parte de ser opcional
+
+OLD: fpdef: NAME | '(' fplist ')'
+NEW: fpdef: NAME | SELF | '(' fplist ')'
+
 fplist: fpdef (',' fpdef)* 
 
 classdef: 'class' NAME ['(' [atom [',' atom]* ] ')'] ':' suite
@@ -93,7 +98,13 @@ $ obs: no forStmt achei melhor nao usar PyNumber, coloquei os NUMBERS como int m
 
 $ coloquei como 'error.show("Unexpected error in ...")' nos erros que NAO DEVEM acontecer (se acontecer, está com erro no código).
 
-$ ver se eh necessario todos os 'return null' quando acontece um erro.
+$ ver se eh necessario todos os 'return null' quando acontece um erro (provavelmente nao, os erros tem 'throw exception')
+    >> verificar se vale a pena usar o error.show com varios parametros, pois o tratamento fica melhor e tem throw exception
+
+$ ver se o tratamento do SELF é só aquilo mesmo (em fpdef)
+
+$ em varargslist, precisa conferir se a ordem dos parametros esta sendo guardada corretamente
+    >> isso vale para todas os ArrayList por causa do genC (?)
 
 =====================================================
 

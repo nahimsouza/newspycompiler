@@ -1,0 +1,2 @@
+1 : Atom expected but not found.
+		d = (6-3) + 1

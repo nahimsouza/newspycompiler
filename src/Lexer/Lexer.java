@@ -184,12 +184,13 @@ public class Lexer {
                     tokenPos++;
                 }
 
+                stringValue = aux;
+                
                 // verifica se é uma palavra-chave
                 Object value = keywordsTable.get(stringValue);
                 if (value == null) {
                     // se nao for uma palavra-chave, significa que é uma variavel
                     token = Symbol.NAME;
-                    stringValue = aux;
                 } else {
                     token = (Integer) value;
                 }

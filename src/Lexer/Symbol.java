@@ -49,7 +49,7 @@ public class Symbol {
             IN = 29,
             NOT = 30,
             IS = 31,
-            XOR = 32,
+            XOR = 32, // ^
             OR = 33,
             AND = 34,
             INVERTION = 35, // ~
@@ -68,7 +68,7 @@ public class Symbol {
             CLASS = 48,
             LEFTCURBRACKET = 49, // [
             RIGHTCURBRACKET = 50, // ]
-            SELF = 51,
+            SELF = 51, // self
             INDENT = 52, //indent
             DEDENT = 53, //dedent
             NEWLINE = 54, // newline

@@ -11,7 +11,7 @@ public class Factor {
         return isFactor;
     }
 
-    public void setFactor(boolean isFactor) {
+    public void setIsFactor(boolean isFactor) {
         this.isFactor = isFactor;
     }
 

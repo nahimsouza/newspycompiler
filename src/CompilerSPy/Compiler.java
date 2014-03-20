@@ -1,3 +1,17 @@
+/**
+ * Lab de Compiladores - BCC, UFSCar, Sorocaba - 2013
+ *
+ * SPy Compiler 
+ * Fernando Villas Boas Alves 
+ * Nahim Alves de Souza
+ *
+ * ====================================================
+ *
+ * Class Compiler:
+ * Contem todos os metodos usados para fazer a analise sintatica
+ * e a analise semantica do compilador.
+ *
+ */
 package CompilerSPy;
 
 import AST.*;
@@ -19,7 +33,7 @@ public class Compiler {
         Program p = null;
         try {
             lexer.nextToken();
-            System.out.print(" " + lexer.token + " ");
+            //System.out.print(" " + lexer.token + " ");
             if (lexer.token == Symbol.EOF) {
                 error.show("Unexpected EOF");
             }
@@ -479,31 +493,32 @@ public class Compiler {
 
         Suite suite = new Suite();
 
-//        if (matchTokens(Symbol.NEWLINE)) {
-//            lexer.nextToken();
-//            
-//            if (matchTokens(Symbol.INDENT)) {
-//                lexer.nextToken();
-//                
-//                suite.setSimpleStmt(false);
-//                suite.addStmt(stmt());
-//
-//                while (!matchTokens(Symbol.DEDENT, Symbol.EOF)) {
-//                    suite.addStmt(stmt());
-//                } 
-//                
-//                if (!matchTokens(Symbol.DEDENT, Symbol.EOF)) {
-//                    error.show("DEDENT expected.");
-//                    lexer.nextToken();
-//                }
-//            } else {
-//                error.show("INDENT expected.");
-//                lexer.nextToken();
-//            }
-//        } else {
-//            suite.setSimpleStmt(true);
-//            suite.setSimplestmt(simple_stmt());
-//        }
+        if (matchTokens(Symbol.NEWLINE)) {
+            lexer.nextToken();
+
+            if (matchTokens(Symbol.INDENT)) {
+                lexer.nextToken();
+
+                suite.setSimpleStmt(false);
+                suite.addStmt(stmt());
+
+                while (!matchTokens(Symbol.DEDENT)) {
+                    suite.addStmt(stmt());
+                }
+            } else {
+                error.show("INDENT expected after NEWLINE in Suite.");
+                lexer.nextToken();
+                return null;
+            }
+        } else if (matchTokens(Symbol.NAME, Symbol.PRINT, Symbol.BREAK, Symbol.CONTINUE, Symbol.RETURN)) {
+            suite.setSimpleStmt(true);
+            suite.setSimplestmt(simple_stmt());
+        } else {
+            error.show("NEWLINE or Simple Statement expected in Suite.");
+            lexer.nextToken();
+            return null;
+        }
+
         return suite;
     }
 
@@ -514,35 +529,30 @@ public class Compiler {
 
         Funcdef func = new Funcdef();
 
-//        if (matchTokens(Symbol.DEF)) {
-//            lexer.nextToken();
-//
-//            if (matchTokens(Symbol.NAME)) {
-//                func.setName(lexer.getStringValue());
-//                lexer.nextToken();
-//
-//                String nome = lexer.getStringValue();
-//                symbolTable.putInGlobal(nome, func);
-//                
-//                func.setParameters(parameters());
-//
-//
-//                if (matchTokens(Symbol.COLON)) {
-//                    lexer.nextToken();
-//                    func.setSuite(suite());
-//
-//                } else {
-//                    error.show("':' expected.");
-//                    lexer.nextToken();
-//                }
-//            } else {
-//                error.show("NAME expected.");
-//                lexer.nextToken();
-//            }
-//        } else {
-//            error.show("DEF expected.");
-//            lexer.nextToken();
-//        }
+        // Ao entrar na funcao, ja deve ter verificado se encontrou a palavra 'def'
+        lexer.nextToken();
+
+        if (matchTokens(Symbol.NAME)) {
+            Name name = new Name(lexer.getStringValue());
+            func.setName(name);
+            lexer.nextToken();
+
+            func.setParameters(parameters());
+
+            if (matchTokens(Symbol.COLON)) {
+                lexer.nextToken();
+                func.setSuite(suite());
+            } else {
+                error.show("':' expected after parameters on function.");
+                lexer.nextToken();
+                return null;
+            }
+        } else {
+            error.show("NAME expected after 'def' on function.");
+            lexer.nextToken();
+            return null;
+        }
+
         return func;
     }
 
@@ -553,47 +563,54 @@ public class Compiler {
 
         Parameters param = new Parameters();
 
-//        if (matchTokens(Symbol.LEFTPAR)) {
-//            lexer.nextToken();
-//            param.setVarargslist(varargslist());
-//
-//            if (matchTokens(Symbol.RIGHTPAR)) {
-//                lexer.nextToken();
-//            } else {
-//                error.show(") expected.");
-//                lexer.nextToken();
-//            }
-//        } else {
-//            error.show("( expected.");
-//            lexer.nextToken();
-//        }
+        if (matchTokens(Symbol.LEFTPAR)) {
+            lexer.nextToken();
+            // varargslist eh opcional, entao precisa verificar se tem ou nao
+            if (matchTokens(Symbol.NAME, Symbol.SELF, Symbol.LEFTPAR)) {
+                param.setVarargslist(varargslist());
+            }
+
+            if (matchTokens(Symbol.RIGHTPAR)) {
+                lexer.nextToken();
+            } else {
+                error.show("')' expected after parameters.");
+                lexer.nextToken();
+                return null;
+            }
+        } else {
+            error.show("'(' expected before parameters.");
+            lexer.nextToken();
+            return null;
+        }
+
         return param;
     }
 
     private Varargslist varargslist() {
         /*
-         * varargslist: ([fpdef ['=' test] (',' fpdef ['=' test])* ] )
+         * varargslist: fpdef ['=' test] (',' fpdef ['=' test])* 
          */
 
         Varargslist var = new Varargslist();
 
-//        var.addFpdef(fpdef());
-//
-//        if (matchTokens(Symbol.ASSIGN)) {
-//            lexer.nextToken();
-//            var.addTest(test());
-//        }
-//
-//        while (matchTokens(Symbol.COMMA)) {
-//            lexer.nextToken();
-//            var.addFpdef(fpdef());
-//
-//            if (matchTokens(Symbol.ASSIGN)) {
-//                lexer.nextToken();
-//                var.addTest(test());
-//            }
-//        }
+        var.addFpdef(fpdef());
+        if (matchTokens(Symbol.ASSIGN)) {
+            lexer.nextToken();
+            var.addTest(test());
+        }
+
+        while (matchTokens(Symbol.COMMA)) {
+            lexer.nextToken();
+            var.addFpdef(fpdef());
+
+            if (matchTokens(Symbol.ASSIGN)) {
+                lexer.nextToken();
+                var.addTest(test());
+            }
+        }
+
         return var;
+
     }
 
     private Fpdef fpdef() {
@@ -603,30 +620,26 @@ public class Compiler {
 
         Fpdef f = new Fpdef();
 
-//        if (matchTokens(Symbol.NAME, Symbol.SELF)) {
-//            f.setName(true);
-//            f.setName(lexer.getStringValue());
-//
-//            // adicionar na tabela global
-//            String nome = lexer.getStringValue();
-//            symbolTable.putInGlobal(nome, f);
-//
-//            lexer.nextToken();
-//
-//        } else if (matchTokens(Symbol.LEFTPAR)) {
-//            lexer.nextToken();
-//            f.setFplist(fplist());
-//
-//            if (matchTokens(Symbol.RIGHTPAR)) {
-//                lexer.nextToken();
-//            } else {
-//                error.show(") expected.");
-//                lexer.nextToken();
-//            }
-//        } else {
-//            error.show("NAME or ( expected.");
-//            lexer.nextToken();
-//        }
+        if (matchTokens(Symbol.NAME, Symbol.SELF)) {
+            Name name = new Name(lexer.getStringValue());
+            f.setName(name);
+            lexer.nextToken();
+        } else if (matchTokens(Symbol.LEFTPAR)) {
+            lexer.nextToken();
+            f.setFplist(fplist());
+            if (matchTokens(Symbol.RIGHTPAR)) {
+                lexer.nextToken();
+            } else {
+                error.show("')' expected after fplist.");
+                lexer.nextToken();
+                return null;
+            }
+        } else {
+            error.show("NAME, 'self' or '(' expected in fpdef.");
+            lexer.nextToken();
+            return null;
+        }
+
         return f;
     }
 
@@ -637,65 +650,66 @@ public class Compiler {
 
         Fplist f = new Fplist();
 
-//        f.addFpdef(fpdef());
-//
-//        while (matchTokens(Symbol.COMMA)) {
-//            lexer.nextToken();
-//            f.addFpdef(fpdef());
-//        }
+        f.addFpdef(fpdef());
+        while (matchTokens(Symbol.COMMA)) {
+            lexer.nextToken();
+            f.addFpdef(fpdef());
+        }
+
         return f;
     }
 
     private Classdef classdef() {
         /*
-         * classdef: 'class' NAME ['(' [atom [',' atom]* ] ')'] ':' suite
+         * classdef: 'class' NAME [ '(' [atom [',' atom]* ] ')' ] ':' suite
          */
 
         Classdef classDef = new Classdef();
 
-//        if (matchTokens(Symbol.CLASS)) {
-//            lexer.nextToken();
-//
-//            if (matchTokens(Symbol.NAME)) {
-//                // Guarda o nome da classe como uma variavel global
-//                String c = lexer.getStringValue();
-//                
-//                classDef.setName(c);
-//                symbolTable.putInGlobal(c, new ClassDef()); 
-//                lexer.nextToken();
-//
-//                if (matchTokens(Symbol.LEFTPAR)) {
-//                    lexer.nextToken();
-//                    classDef.addAtomList(atom());
-//
-//                    while (matchTokens(Symbol.COMMA)) {
-//                        lexer.nextToken();
-//                        classDef.addAtomList(atom());
-//                    }
-//
-//                    if (matchTokens(Symbol.RIGHTPAR)) {
-//                        lexer.nextToken();
-//                    } else {
-//                        error.show(") expected.");
-//                        lexer.nextToken();
-//                    }
-//                }
-//
-//                if (matchTokens(Symbol.COLON)) {
-//                    lexer.nextToken();
-//                    classDef.setSuite(suite());
-//                } else {
-//                    error.show(": expected.");
-//                    lexer.nextToken();
-//                }
-//            } else {
-//                error.show("Class Name expected.");
-//                lexer.nextToken();
-//            }
-//        } else {
-//            error.show("class expected.");
-//            lexer.nextToken();
-//        }
+        // A verificacao para saber se tem a palavra 'class' eh feita antes de entrar no metodo
+        lexer.nextToken();
+
+        if (matchTokens(Symbol.NAME)) {
+            // Guarda o nome da classe como uma variavel global
+            Name name = new Name(lexer.getStringValue());
+            classDef.setName(name);
+            lexer.nextToken();
+            
+            if (matchTokens(Symbol.LEFTPAR)) {
+                lexer.nextToken();
+                
+                // ver se tem algum atom
+                if (matchTokens(Symbol.LEFTCURBRACKET, Symbol.NAME, Symbol.NUM, Symbol.STRING)) {
+                    classDef.addAtom(atom());
+                
+                    while (matchTokens(Symbol.COMMA)) {
+                        lexer.nextToken();
+                        classDef.addAtom(atom());
+                    }
+                }
+
+                if (matchTokens(Symbol.RIGHTPAR)) {
+                    lexer.nextToken();
+                } else {
+                    error.show("')' expected before ':' in class definition.");
+                    lexer.nextToken();
+                    return null;
+                }
+            }
+
+            if (matchTokens(Symbol.COLON)) {
+                lexer.nextToken();
+                classDef.setSuite(suite());
+            } else {
+                error.show("':' expected before suite in class definition.");
+                lexer.nextToken();
+            }
+        } else {
+            error.show("NAME expected in class definition.");
+            lexer.nextToken();
+            return null;
+        }
+
         return classDef;
     }
 
@@ -706,18 +720,22 @@ public class Compiler {
 
         Test test = new Test();
 
-//        test.setOrtest(or_test());
-//
-//        if (matchTokens(Symbol.IF)) {
-//            lexer.nextToken();
-//            test.setIfortest(or_test());
-//
-//            if (matchTokens(Symbol.ELSE)) {
-//                lexer.nextToken();
-//            }
-//
-//            test.setElsetest(test());
-//        }
+        test.setOrtest(or_test());
+
+        if (matchTokens(Symbol.IF)) {
+            lexer.nextToken();
+            test.setIfortest(or_test());
+
+            if (matchTokens(Symbol.ELSE)) {
+                lexer.nextToken();
+                test.setElsetest(test());
+            } else {
+                error.show("'else' expected after or_test in test.");
+                lexer.nextToken();
+                return null;
+            }
+        }
+
         return test;
     }
 
@@ -728,12 +746,13 @@ public class Compiler {
 
         OrTest orTest = new OrTest();
 
-//        orTest.addAndTest(and_test());
-//
-//        if (matchTokens(Symbol.OR)) {
-//            lexer.nextToken();
-//            orTest.addAndTest(and_test());
-//        }
+        orTest.addAndTest(and_test());
+
+        while (matchTokens(Symbol.OR)) {
+            lexer.nextToken();
+            orTest.addAndTest(and_test());
+        }
+        
         return orTest;
     }
 
@@ -744,12 +763,13 @@ public class Compiler {
 
         AndTest andTest = new AndTest();
 
-//        andTest.addNotTest(not_test());
-//
-//        if (matchTokens(Symbol.AND)) {
-//            lexer.nextToken();
-//            andTest.addNotTest(not_test());
-//        }
+        andTest.addNottest(not_test());
+
+        while (matchTokens(Symbol.AND)) {
+            lexer.nextToken();
+            andTest.addNottest(not_test());
+        }
+
         return andTest;
     }
 
@@ -760,65 +780,86 @@ public class Compiler {
 
         NotTest notTest = new NotTest();
 
-//        if (matchTokens(Symbol.NOT)) {
-//            lexer.nextToken();
-//            notTest.setNotTest(not_test());
-//        } else {
-//            notTest.setComparison(comparison());
-//        }
+        if (matchTokens(Symbol.NOT)) {
+            lexer.nextToken();
+            notTest.setNotTest(not_test());
+            notTest.setIsNotTest(true);
+        } else {
+            notTest.setComparison(comparison());
+            notTest.setIsNotTest(false);
+        }
+        
         return notTest;
     }
 
     private Comparison comparison() {
         /*
          * comparison: expr (comp_op expr)*
-         *
-         * comp_op: '<'|'>'|'=='|'>='|'<='|'<>'|'!='|'in'|'not' 'in'|'is'|'is' 'not'
          */
 
         Comparison comparison = new Comparison();
 
-//        comparison.setExpr(expr());
-//
-//        String op;
-//
-//        if (matchTokens(Symbol.LT, Symbol.GT, Symbol.EQ, Symbol.GE, Symbol.LE,
-//                Symbol.NEQ, Symbol.NEQC, Symbol.IN, Symbol.IS, Symbol.NOT)) {
-//
-//            if (matchTokens(Symbol.LT)) {
-//                op = "<";
-//            } else if (matchTokens(Symbol.GT)) {
-//                op = ">";
-//            } else if (matchTokens(Symbol.EQ)) {
-//                op = "==";
-//            } else if (matchTokens(Symbol.GE)) {
-//                op = ">=";
-//            } else if (matchTokens(Symbol.LE)) {
-//                op = "<=";
-//            } else if (matchTokens(Symbol.NEQ)) {
-//                op = "<>";
-//            } else if (matchTokens(Symbol.NEQC)) {
-//                op = "!=";
-//            } else if (matchTokens(Symbol.IN)) {
-//                op = "in";
-//            } else if (matchTokens(Symbol.IS)) {
-//                op = "is";
-//            } else {
-//                op = "not";
-//            }
-//            CompOp c = new CompOp(op);
-//
-//            comparison.addCompOp(c);
-//
-//            lexer.nextToken();
-//
-//            comparison.addExprs(expr());
-//        }
-////        } else {
-////            error.show("compOp expected.");
-////            lexer.nextToken();
-////        }
+        comparison.setExpr(expr());
+
+        while (matchTokens(Symbol.LT, Symbol.GT, Symbol.EQ, Symbol.GE, Symbol.LE,
+                Symbol.NEQ, Symbol.NEQC, Symbol.IN, Symbol.IS, Symbol.NOT)) {
+            comparison.addCompOp(compOp());
+            comparison.addExprs(expr());
+        }
+        
         return comparison;
+    }
+    
+    private CompOp compOp() {
+        /*
+         * comp_op: '<'|'>'|'=='|'>='|'<='|'<>'|'!='|'in'|'not' 'in'|'is'|'is' 'not'
+         */
+        
+        if (matchTokens(Symbol.LT)) {
+            lexer.nextToken();
+            return new CompOp("<");
+        } else if (matchTokens(Symbol.GT)) {
+            lexer.nextToken();
+            return new CompOp(">");
+        } else if (matchTokens(Symbol.EQ)) {
+            lexer.nextToken();
+            return new CompOp("==");
+        } else if (matchTokens(Symbol.GE)) {
+            lexer.nextToken();
+            return new CompOp(">=");
+        } else if (matchTokens(Symbol.LE)) {
+            lexer.nextToken();
+            return new CompOp("<=");
+        } else if (matchTokens(Symbol.NEQ)) {
+            lexer.nextToken();
+            return new CompOp("<>");
+        } else if (matchTokens(Symbol.NEQC)) {
+            lexer.nextToken();
+            return new CompOp("!=");
+        } else if (matchTokens(Symbol.IN)) {
+            lexer.nextToken();
+            return new CompOp("in");
+        } else if (matchTokens(Symbol.IS)) {
+            lexer.nextToken();
+            if (matchTokens(Symbol.NOT)){
+                lexer.nextToken();
+                return new CompOp("is not");
+            } else {
+                return new CompOp("is");
+            }
+        } else if (matchTokens(Symbol.NOT)){
+            lexer.nextToken();
+            if (matchTokens(Symbol.IN)){
+                lexer.nextToken();
+                return new CompOp("not in");
+            } else {
+                return new CompOp("not");
+            }
+        } else {
+            error.show("Unexpected error on compOp.");
+            lexer.nextToken();
+            return null;
+        }        
     }
 
     private Expr expr() {
@@ -828,32 +869,46 @@ public class Compiler {
 
         Expr expr = new Expr();
 
-//        expr.addXorExpr(xor_expr());
-//
-//        while (matchTokens(Symbol.ORBAR)) {
-//            lexer.nextToken();
-//            expr.addXorExpr(xor_expr());
-//        }
+        expr.addXorExpr(xor_expr());
+        while (matchTokens(Symbol.ORBAR)) {
+            lexer.nextToken();
+            expr.addXorExpr(xor_expr());
+        }
+        
         return expr;
     }
 
     private XorExpr xor_expr() {
         /*
-         * and_expr: arith_expr ('&' arith_expr)*
+         * xor_expr: and_expr ('^' and_expr)*
          */
 
         XorExpr xor = new XorExpr();
 
-//        ArithExpr aexpr = new ArithExpr();
-//        aexpr = arith_expr();
-//
-//        xor.addArithExpr(aexpr);
-//
-//        while (matchTokens(Symbol.EC)) {
-//            lexer.nextToken();
-//            xor.addArithExpr(arith_expr());
-//        }
+        xor.addAndExpr(and_expr());
+
+        while (matchTokens(Symbol.XOR)) {
+            lexer.nextToken();
+            xor.addAndExpr(and_expr());
+        }
+        
         return xor;
+    }
+    
+    private AndExpr and_expr() {
+        /*
+         * and_expr: arith_expr ('&' arith_expr)*
+         */
+
+        AndExpr and = new AndExpr();
+
+        and.addArithExpr(arith_expr());
+        while (matchTokens(Symbol.EC)){
+            lexer.nextToken();
+            and.addArithExpr(arith_expr());
+        }
+        
+        return and;
     }
 
     private ArithExpr arith_expr() {
@@ -863,61 +918,48 @@ public class Compiler {
 
         ArithExpr arith = new ArithExpr();
 
-//        arith.setTerm(term());
-//
-//        while (matchTokens(Symbol.PLUS) || matchTokens(Symbol.MINUS)) {
-//            if (matchTokens(Symbol.PLUS)) {
-//                arith.addOp("+");
-//            } else {
-//                arith.addOp("-");
-//            }
-//            lexer.nextToken();
-//            arith.addTerm(term());
-//        }
+        arith.setTerm(term());
+
+        while (matchTokens(Symbol.PLUS) || matchTokens(Symbol.MINUS)) {
+            if (matchTokens(Symbol.PLUS)) {
+                arith.addOp("+");
+            } else {
+                arith.addOp("-");
+            }
+            lexer.nextToken();
+            arith.addTerm(term());
+        }
+        
         return arith;
     }
 
     private Term term() {
         /*
-         * ORIGINAL -> term: factor (('*'|'/'|'%'|'//') factor)*
-         * MUDADO Pq?? -> term: factor (('*'|'/'|'%'|'//') (('int'|'float') '(' arith_expr ')' | factor))*
-         * 
+         * term: factor (('*'|'/'|'%'|'//') factor)*
          */
 
         Term term = new Term();
 
-//        String op;
-//        term.setFactor(factor());
-//
-//        while (matchTokens(Symbol.MULT) || matchTokens(Symbol.DIV) || matchTokens(Symbol.MOD) || matchTokens(Symbol.FLOORDIV)) {
-//
-//            if (matchTokens(Symbol.MULT)) {
-//                op = "*";
-//            } else if (matchTokens(Symbol.DIV)) {
-//                op = "/";
-//            } else if (matchTokens(Symbol.MOD)) {
-//                op = "%";
-//            } else {
-//                op = "//";
-//            }
-//
-//            term.addOp(op);
-//            lexer.nextToken();
-//            
-//            if(matchTokens(Symbol.NAME) && (lexer.getStringValue().contentEquals("int")) || lexer.getStringValue().contentEquals("float")){
-//                lexer.nextToken();
-//                
-//                if(matchTokens(Symbol.LEFTPAR)){
-//                    lexer.nextToken();
-//                    
-//                    arith_expr();
-//                    if(matchTokens(Symbol.RIGHTPAR)){
-//                        lexer.nextToken();
-//                    }
-//                }
-//            }else
-//                term.addFactor(factor());
-//        }
+        String op;
+        term.setFactor(factor());
+
+        while (matchTokens(Symbol.MULT) || matchTokens(Symbol.DIV) || matchTokens(Symbol.MOD) || matchTokens(Symbol.FLOORDIV)) {
+
+            if (matchTokens(Symbol.MULT)) {
+                op = "*";
+            } else if (matchTokens(Symbol.DIV)) {
+                op = "/";
+            } else if (matchTokens(Symbol.MOD)) {
+                op = "%";
+            } else {
+                op = "//";
+            }
+
+            term.addOp(op);
+            lexer.nextToken();
+            term.addFactor(factor());
+        }
+        
         return term;
     }
 
@@ -927,16 +969,28 @@ public class Compiler {
          */
 
         Factor factor = new Factor();
+        String op = "";
+        
+        if (matchTokens(Symbol.PLUS) || matchTokens(Symbol.MINUS) || matchTokens(Symbol.INVERTION)) {
+            
+            if (lexer.token == Symbol.PLUS){
+                op = "+";
+            } else if (lexer.token == Symbol.MINUS){
+                op = "-";
+            } else if (lexer.token == Symbol.INVERTION){
+                op = "~";
+            }  
+            
+            factor.setOp(op);
+            lexer.nextToken();
+            factor.setFactor(factor());
+            factor.setIsFactor(true);
+            
+        } else {
+            factor.setAtom(atom());
+            factor.setIsFactor(false);
+        }
 
-//        if (matchTokens(Symbol.PLUS) || matchTokens(Symbol.MINUS) || matchTokens(Symbol.INVERTION)) {
-//            factor.setOp(lexer.token);
-//            lexer.nextToken();
-//            factor.setFactor(factor());
-//            factor.setFactor(true);
-//        } else {
-//            factor.setAtom(atom());
-//            factor.setFactor(false);
-//        }
         return factor;
     }
 
@@ -947,56 +1001,40 @@ public class Compiler {
 
         Atom atom = new Atom();
 
-//        if (matchTokens(Symbol.LEFTCURBRACKET)) {
-//            lexer.nextToken();
-//            atom.setToTestlist();
-//            atom.setTestlist(listmaker());
-//
-//            if (!matchTokens(Symbol.RIGHTCURBRACKET)) {
-//                error.show("] expected.");
-//                lexer.nextToken();
-//            }
-//        } else if (matchTokens(Symbol.NAME)) {
-//            atom.setToName();
-//            atom.setName(lexer.getStringValue());
-//
-//            lexer.nextToken();
-//        } else if (matchTokens(Symbol.NUM)) {
-//            atom.setToNumber();
-//            atom.setNumber(lexer.getNumberValue());
-//            lexer.nextToken();
-//        } else if (matchTokens(Symbol.STRING)) {
-//            atom.setToString();
-//            while (matchTokens(Symbol.STRING)) {
-//                atom.addString(lexer.getStringValue());
-//
-//                String nome = lexer.getStringValue();
-//                symbolTable.putInLocal(nome, atom);
-//
-//                lexer.nextToken();
-//            }
-//        } else if (matchTokens(Symbol.SELF)) {
-//            atom.setToSelf();
-//            atom.setName(lexer.getStringValue());
-//            lexer.nextToken();
-//            
-//            if (matchTokens(Symbol.DOT)){
-//                lexer.nextToken();
-//                if (matchTokens(Symbol.NAME)){
-//                    lexer.nextToken();
-//                } else {
-//                    error.show("ID expected.");
-//                    lexer.nextToken();
-//                }
-//            } else {
-//                error.show("'.' expected.");
-//                lexer.nextToken();
-//            }
-//            
-//        } else {
-//            error.show("Atom Error");
-//            lexer.nextToken();
-//        }
+        if (matchTokens(Symbol.LEFTCURBRACKET)) {
+            lexer.nextToken();
+            if (!matchTokens(Symbol.RIGHTCURBRACKET)) {
+                atom.setToListmaker(); // identifica que o atom eh um listmaker
+                atom.setListmaker(listmaker());
+                if (!matchTokens(Symbol.RIGHTCURBRACKET)){
+                    error.show("']' expected after listmaker in atom.");
+                }
+            } else {
+                lexer.nextToken();
+            }
+        } else if (matchTokens(Symbol.NAME)) {
+            atom.setToName(); // identifica que o atom eh um NAME
+            Name name = new Name(lexer.getStringValue());
+            atom.setName(name);
+            lexer.nextToken();
+        } else if (matchTokens(Symbol.NUM)) {
+            PyNumber number = new PyNumber(lexer.getNumberValue());
+            atom.setToNumber(); // identifica que eh um NUMBER
+            atom.setNumber(number);
+            lexer.nextToken();
+        } else if (matchTokens(Symbol.STRING)) {
+            atom.setToString(); // identifica que eh um STRING+
+            while (matchTokens(Symbol.STRING)) {
+                PyString str = new PyString(lexer.getStringValue());
+                atom.addString(str);
+                lexer.nextToken();
+            }
+        } else {
+            error.show("Atom expected but not found.");
+            lexer.nextToken();
+            return null;
+        }
+
         return atom;
     }
 
@@ -1007,12 +1045,12 @@ public class Compiler {
 
         Listmaker listmaker = new Listmaker();
 
-//        listmaker.addTest(test());
-//
-//        while (matchTokens(Symbol.COMMA)) {
-//            lexer.nextToken();
-//            listmaker.addTest(test());
-//        }
+        listmaker.addTest(test());
+        while (matchTokens(Symbol.COMMA)) {
+            lexer.nextToken();
+            listmaker.addTest(test());
+        }
+
         return listmaker;
     }
 

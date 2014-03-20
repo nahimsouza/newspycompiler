@@ -10,10 +10,10 @@ public class NotTest {
         return isNotTest;
     }
 
-    public void setNotTest(boolean isNotTest) {
+    public void setIsNotTest(boolean isNotTest) {
         this.isNotTest = isNotTest;
     }
-
+    
     public NotTest getNotTest() {
         return notTest;
     }
@@ -31,18 +31,18 @@ public class NotTest {
     }
 
     public void genC(int tabs) {
-        String x = "";
-        int tab = tabs;
-        while (tabs != 0) {
-            x = x.concat("  ");
-            tabs--;
-        }
-        System.out.println(x + this.getClass().getName());
-        if (isNotTest) {
-            notTest.genC(tab + 1);
-        } else {
-            comparison.genC(tab + 1);
-        }
+//        String x = "";
+//        int tab = tabs;
+//        while (tabs != 0) {
+//            x = x.concat("  ");
+//            tabs--;
+//        }
+//        System.out.println(x + this.getClass().getName());
+//        if (isNotTest) {
+//            notTest.genC(tab + 1);
+//        } else {
+//            comparison.genC(tab + 1);
+//        }
     }
 
     private boolean isNotTest;
