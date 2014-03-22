@@ -365,6 +365,9 @@ public class Lexer {
                     case ']':
                         token = Symbol.RIGHTCURBRACKET;
                         break;
+                    case '.':
+                        token = Symbol.DOT;
+                        break;
                     default:
                         error.show("Invalid Character: '" + ch + "'", false);
                 }

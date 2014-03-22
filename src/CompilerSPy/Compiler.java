@@ -106,9 +106,10 @@ public class Compiler {
 
         if (!matchTokens(Symbol.NEWLINE)) {
             error.show("NEWLINE expected.");
+        } else {
+            lexer.nextToken();           
         }
 
-        lexer.nextToken();
 
         return stmt;
     }
@@ -184,9 +185,9 @@ public class Compiler {
 
         } else {
             error.show("ASSIGN expected.");
-            lexer.nextToken();
-            return null;
         }
+        
+        return null;
     }
 
     private Targetlist targetlist() {
@@ -218,8 +219,6 @@ public class Compiler {
             lexer.nextToken();
         } else {
             error.show("NAME expected in TARGET (on targetlist from Expression Statement).");
-            lexer.nextToken();
-            return null;
         }
 
         return target;
@@ -268,7 +267,6 @@ public class Compiler {
             flowStmt = new ReturnStmt(test());
         } else {
             error.show("Unexpected error in Flow Statement.");
-            lexer.nextToken();
         }
 
         return flowStmt;
@@ -291,9 +289,9 @@ public class Compiler {
             return classdef();
         } else {
             error.show("Unexpected error in Compound Statement.");
-            lexer.nextToken();
-            return null;
         }
+        
+        return null;
     }
 
     private IfStmt if_stmt() {
@@ -312,8 +310,6 @@ public class Compiler {
             ifStmt.setSif(suite());
         } else {
             error.show("':' expected after IF test.");
-            lexer.nextToken();
-            return null;
         }
 
         while (matchTokens(Symbol.ELIF)) {
@@ -325,8 +321,6 @@ public class Compiler {
                 ifStmt.addSelif(suite());
             } else {
                 error.show("':' expected after ELIF test.");
-                lexer.nextToken();
-                return null;
             }
         }
 
@@ -337,8 +331,6 @@ public class Compiler {
                 ifStmt.setSelse(suite());
             } else {
                 error.show("':' expected after ELSE.");
-                lexer.nextToken();
-                return null;
             }
         }
 
@@ -361,8 +353,6 @@ public class Compiler {
             whileStmt.setSuite(suite());
         } else {
             error.show("':' expected after WHILE test.");
-            lexer.nextToken();
-            return null;
         }
 
         if (matchTokens(Symbol.ELSE)) {
@@ -373,8 +363,6 @@ public class Compiler {
                 whileStmt.setEsuite(suite());
             } else {
                 error.show("':' expected after WHILE else.");
-                lexer.nextToken();
-                return null;
             }
         }
 
@@ -422,36 +410,24 @@ public class Compiler {
                                     lexer.nextToken();
                                 } else {
                                     error.show("')' expected after 'NUMBER' in For Statement.");
-                                    lexer.nextToken();
-                                    return null;
                                 }
                             } else {
                                 error.show("NUMBER expected after ',' in For Statement.");
-                                lexer.nextToken();
-                                return null;
                             }
                         } else {
                             error.show("',' expected after NUMBER in For Statement.");
-                            lexer.nextToken();
-                            return null;
                         }
                     } else {
                         error.show("NUMBER expected after '(' in For Statement.");
-                        lexer.nextToken();
-                        return null;
                     }
                 } else {
                     error.show("'(' expected after 'range'.");
-                    lexer.nextToken();
-                    return null;
                 }
 
             } else if (matchTokens(Symbol.LEFTCURBRACKET, Symbol.NAME, Symbol.NUM, Symbol.STRING)) {
                 forStmt.setAtom(atom());
             } else {
                 error.show("ATOM or 'range' expected after 'in' in For Statement.");
-                lexer.nextToken();
-                return null;
             }
 
             // deve entrar aqui quando usar em ambos os casos do ForStmt
@@ -467,20 +443,14 @@ public class Compiler {
                         forStmt.setElseSuite(suite());
                     } else {
                         error.show(": expected after ELSE in For Statement.");
-                        lexer.nextToken();
-                        return null;
                     }
                 }
             } else {
                 error.show("':' expected after ATOM in For Statement.");
-                lexer.nextToken();
-                return null;
             }
 
         } else {
             error.show("'in' expected after NAME in For Statement.");
-            lexer.nextToken();
-            return null;
         }
 
         return forStmt;
@@ -507,16 +477,12 @@ public class Compiler {
                 }
             } else {
                 error.show("INDENT expected after NEWLINE in Suite.");
-                lexer.nextToken();
-                return null;
             }
         } else if (matchTokens(Symbol.NAME, Symbol.PRINT, Symbol.BREAK, Symbol.CONTINUE, Symbol.RETURN)) {
             suite.setSimpleStmt(true);
             suite.setSimplestmt(simple_stmt());
         } else {
             error.show("NEWLINE or Simple Statement expected in Suite.");
-            lexer.nextToken();
-            return null;
         }
 
         return suite;
@@ -544,13 +510,9 @@ public class Compiler {
                 func.setSuite(suite());
             } else {
                 error.show("':' expected after parameters on function.");
-                lexer.nextToken();
-                return null;
             }
         } else {
             error.show("NAME expected after 'def' on function.");
-            lexer.nextToken();
-            return null;
         }
 
         return func;
@@ -574,13 +536,9 @@ public class Compiler {
                 lexer.nextToken();
             } else {
                 error.show("')' expected after parameters.");
-                lexer.nextToken();
-                return null;
             }
         } else {
             error.show("'(' expected before parameters.");
-            lexer.nextToken();
-            return null;
         }
 
         return param;
@@ -631,13 +589,9 @@ public class Compiler {
                 lexer.nextToken();
             } else {
                 error.show("')' expected after fplist.");
-                lexer.nextToken();
-                return null;
             }
         } else {
             error.show("NAME, 'self' or '(' expected in fpdef.");
-            lexer.nextToken();
-            return null;
         }
 
         return f;
@@ -692,8 +646,6 @@ public class Compiler {
                     lexer.nextToken();
                 } else {
                     error.show("')' expected before ':' in class definition.");
-                    lexer.nextToken();
-                    return null;
                 }
             }
 
@@ -702,12 +654,9 @@ public class Compiler {
                 classDef.setSuite(suite());
             } else {
                 error.show("':' expected before suite in class definition.");
-                lexer.nextToken();
             }
         } else {
             error.show("NAME expected in class definition.");
-            lexer.nextToken();
-            return null;
         }
 
         return classDef;
@@ -731,8 +680,6 @@ public class Compiler {
                 test.setElsetest(test());
             } else {
                 error.show("'else' expected after or_test in test.");
-                lexer.nextToken();
-                return null;
             }
         }
 
@@ -857,9 +804,9 @@ public class Compiler {
             }
         } else {
             error.show("Unexpected error on compOp.");
-            lexer.nextToken();
-            return null;
         }        
+        
+        return null;
     }
 
     private Expr expr() {
@@ -920,7 +867,7 @@ public class Compiler {
 
         arith.setTerm(term());
 
-        while (matchTokens(Symbol.PLUS) || matchTokens(Symbol.MINUS)) {
+        while (matchTokens(Symbol.PLUS, Symbol.MINUS)) {
             if (matchTokens(Symbol.PLUS)) {
                 arith.addOp("+");
             } else {
@@ -943,7 +890,7 @@ public class Compiler {
         String op;
         term.setFactor(factor());
 
-        while (matchTokens(Symbol.MULT) || matchTokens(Symbol.DIV) || matchTokens(Symbol.MOD) || matchTokens(Symbol.FLOORDIV)) {
+        while (matchTokens(Symbol.MULT, Symbol.DIV, Symbol.MOD, Symbol.FLOORDIV)) {
 
             if (matchTokens(Symbol.MULT)) {
                 op = "*";
@@ -971,7 +918,7 @@ public class Compiler {
         Factor factor = new Factor();
         String op = "";
         
-        if (matchTokens(Symbol.PLUS) || matchTokens(Symbol.MINUS) || matchTokens(Symbol.INVERTION)) {
+        if (matchTokens(Symbol.PLUS, Symbol.MINUS, Symbol.INVERTION)) {
             
             if (lexer.token == Symbol.PLUS){
                 op = "+";
@@ -996,7 +943,7 @@ public class Compiler {
 
     private Atom atom() {
         /*
-         * atom: '[' [listmaker] ']' | NAME | NUMBER | STRING+
+         * atom: '[' [listmaker] ']' | NAME | NUMBER | STRING+ | ('self' '.' NAME)
          */
 
         Atom atom = new Atom();
@@ -1029,10 +976,23 @@ public class Compiler {
                 atom.addString(str);
                 lexer.nextToken();
             }
-        } else {
-            error.show("Atom expected but not found.");
+        } else if (matchTokens(Symbol.SELF)) {
+            atom.setToSelf();
             lexer.nextToken();
-            return null;
+            if (matchTokens(Symbol.DOT)) {
+                lexer.nextToken();
+                if (matchTokens(Symbol.NAME)) {
+                    Name name = new Name(lexer.getStringValue());
+                    atom.setName(name);
+                    lexer.nextToken();
+                } else {
+                    error.show("NAME expected after '.' in Atom");
+                }
+            } else {
+                error.show("'.' expected after self in Atom.");
+            }
+        } else {
+            error.show("Listmaker, NAME, NUMBER, STRING or SELF expected in Atom.");
         }
 
         return atom;

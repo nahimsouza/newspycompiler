@@ -44,11 +44,11 @@ public class Atom {
         return tipo;
     }
 
+    // Apenas armazena em tipo o que esta sendo guardado no Atom.
     public void setToName() {
         tipo = "name";
     }
     
-    // Apenas armazena em tipo o que esta sendo guardado no Atom.
     public void setToListmaker() {
         tipo = "listmaker";
     }
@@ -59,6 +59,10 @@ public class Atom {
 
     public void setToString() {
         tipo = "string";
+    }
+    
+    public void setToSelf() {
+        tipo = "self";
     }
 
     public void genC(int tabs) {
@@ -86,4 +90,5 @@ public class Atom {
     private PyNumber number;
     private List<PyString> string;
     private String tipo;
+
 }

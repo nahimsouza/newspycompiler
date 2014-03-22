@@ -75,5 +75,6 @@ public class Symbol {
             ORBAR = 55, // "|"
             EC = 56, // "&"
             STRING = 57,
+            DOT = 58, // .
             LastSymbol = 99;
 }

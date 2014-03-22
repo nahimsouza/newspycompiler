@@ -28,10 +28,9 @@ public class CompilerError {
         // is goPreviousToken is true, the error is signalled at the line of the
         // previous token, not the last one.
         if (goPreviousToken) {
-            show(strMessage, lexer.getLineBeforeLastToken(),
-                    lexer.getLineNumberBeforeLastToken());
+            show(strMessage, lexer.getLineBeforeLastToken(), lexer.getLineNumberBeforeLastToken());
         } else {
-            show(strMessage, lexer.getCurrentLine(), lexer.getLineNumber());
+            show(strMessage, lexer.getCurrentLine(), lexer.getLineNumberBeforeLastToken());
         }
     }
 
@@ -83,8 +82,8 @@ public class CompilerError {
     private PrintWriter out;
     private boolean thereWasAnError;
 }
-    
-/*
-begin expected
 
-*/
+/*
+ begin expected
+
+ */
