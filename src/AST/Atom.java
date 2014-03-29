@@ -40,8 +40,36 @@ public class Atom {
         this.string.add(string);
     }
 
+    public List<PyString> getStringList() {
+        return string;
+    }
+    
     public String getTipo() {
         return tipo;
+    }
+
+    public Parameters getParameters() {
+        return parameters;
+    }
+
+    public void setParameters(Parameters parameters) {
+        this.parameters = parameters;
+    }
+
+    public Name getFuncName() {
+        return funcName;
+    }
+
+    public void setFuncName(Name funcName) {
+        this.funcName = funcName;
+    }
+
+    public Test getParTest() {
+        return parTest;
+    }
+
+    public void setParTest(Test parTest) {
+        this.parTest = parTest;
     }
 
     // Apenas armazena em tipo o que esta sendo guardado no Atom.
@@ -64,6 +92,23 @@ public class Atom {
     public void setToSelf() {
         tipo = "self";
     }
+    
+    public void setToFunc(){
+        tipo = "func";
+    }
+    
+    public void setToParTest(){
+        tipo = "partest";
+    }
+    
+    public void setToIntCast(){
+        tipo = "intTest";
+    }
+    
+    public void setToFloatCast(){
+        tipo = "floatCast";
+    }
+    
 
     public void genC(int tabs) {
 //        String x = "";
@@ -87,8 +132,11 @@ public class Atom {
     }
     private Listmaker listmaker;
     private Name name;
+    private Name funcName;
     private PyNumber number;
     private List<PyString> string;
     private String tipo;
+    private Parameters parameters;
+    private Test parTest;
 
 }

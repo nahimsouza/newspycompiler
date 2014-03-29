@@ -74,7 +74,7 @@ public class Compiler {
             return null;
         }
 
-        if (matchTokens(Symbol.NAME, Symbol.PRINT, Symbol.BREAK, Symbol.CONTINUE, Symbol.RETURN)) {
+        if (matchTokens(Symbol.NAME, Symbol.PRINT, Symbol.BREAK, Symbol.CONTINUE, Symbol.RETURN, Symbol.SELF)) {
             stmt = simple_stmt();
         } else if (matchTokens(Symbol.IF, Symbol.WHILE, Symbol.FOR, Symbol.DEF, Symbol.CLASS)) {
             stmt = compound_stmt();
@@ -87,7 +87,7 @@ public class Compiler {
 
     private SimpleStmt simple_stmt() {
         /*
-         * simple_stmt: small_stmt (';' small_stmt)* NEWLINE
+         * simple_stmt: small_stmt (';' small_stmt)* [';'] NEWLINE
          */
 
         SimpleStmt stmt = new SimpleStmt();
@@ -96,7 +96,9 @@ public class Compiler {
 
         while (matchTokens(Symbol.SEMICOLON)) {
             lexer.nextToken();
-            stmt.addStmt(small_stmt());
+            if (!matchTokens(Symbol.NEWLINE)) {
+                stmt.addStmt(small_stmt());
+            }
         }
 
         // se chegou ao fim do arquivo
@@ -121,7 +123,7 @@ public class Compiler {
 
         SmallStmt stmt = null;
 
-        if (matchTokens(Symbol.NAME)) {
+        if (matchTokens(Symbol.NAME, Symbol.SELF)) {
             stmt = expr_stmt();
         } else if (matchTokens(Symbol.PRINT)) {
             stmt = print_stmt();
@@ -151,13 +153,13 @@ public class Compiler {
 
     private Augassign augassign() {
         /*
-         * augassign: ('=' | '+=' | '-=' | '*=' | '/=' | '%=' | '&=' | '|=' | '^=')
+         * augassign: ('=' | '+=' | '-=' | '*=' | '/=' | '%=' | '&=' | '|=' | '^=' | '.')
          */
 
         String op = "";
         if (matchTokens(Symbol.ASSIGN, Symbol.PLUSASSIGN, Symbol.MINUSASSIGN,
                 Symbol.MULTIASSIGN, Symbol.DIVASSIGN, Symbol.MODASSIGN, Symbol.ANDASSIGN,
-                Symbol.ORASSIGN, Symbol.XORASSIGN)) {
+                Symbol.ORASSIGN, Symbol.XORASSIGN, Symbol.DOT)) {
 
             if (matchTokens(Symbol.ASSIGN)) {
                 op = "=";
@@ -175,6 +177,8 @@ public class Compiler {
                 op = "&=";
             } else if (matchTokens(Symbol.ORASSIGN)) {
                 op = "|=";
+            } else if (matchTokens(Symbol.DOT)) {
+                op = ".";
             } else {
                 op = "^=";
             }
@@ -208,17 +212,29 @@ public class Compiler {
 
     private Target target() {
         /*
-         * target = NAME
+         * target = NAME | ('self' '.' NAME)
          */
 
         Target target = new Target();
 
         if (matchTokens(Symbol.NAME)) {
             Name name = new Name(lexer.getStringValue());
+            target.setToName(); // define como tipo NAME
             target.setName(name);
             lexer.nextToken();
+        } else if (matchTokens(Symbol.SELF)) {
+            target.setToSelf();
+            lexer.nextToken();
+            if (matchTokens(Symbol.DOT)){
+                lexer.nextToken();
+                Name name = new Name(lexer.getStringValue());
+                target.setName(name);
+                lexer.nextToken();    
+            } else {
+                error.show("'.' expected after 'self' in target (on targetlist from Expression Statement)..");
+            }
         } else {
-            error.show("NAME expected in TARGET (on targetlist from Expression Statement).");
+            error.show("NAME or 'self' expected in target (on targetlist from Expression Statement).");
         }
 
         return target;
@@ -397,13 +413,13 @@ public class Compiler {
                 if (matchTokens(Symbol.LEFTPAR)) {
                     lexer.nextToken();
                     if (matchTokens(Symbol.NUM)) {
-                        int num1 = lexer.getNumberValue();
+                        double num1 = lexer.getNumberValue();
                         forStmt.setNumber1(num1);
                         lexer.nextToken();
                         if (matchTokens(Symbol.COMMA)) {
                             lexer.nextToken();
                             if (matchTokens(Symbol.NUM)) {
-                                int num2 = lexer.getNumberValue();
+                                double num2 = lexer.getNumberValue();
                                 forStmt.setNumber2(num2);
                                 lexer.nextToken();
                                 if (matchTokens(Symbol.RIGHTPAR)) {
@@ -475,6 +491,7 @@ public class Compiler {
                 while (!matchTokens(Symbol.DEDENT)) {
                     suite.addStmt(stmt());
                 }
+                lexer.nextToken();
             } else {
                 error.show("INDENT expected after NEWLINE in Suite.");
             }
@@ -528,7 +545,7 @@ public class Compiler {
         if (matchTokens(Symbol.LEFTPAR)) {
             lexer.nextToken();
             // varargslist eh opcional, entao precisa verificar se tem ou nao
-            if (matchTokens(Symbol.NAME, Symbol.SELF, Symbol.LEFTPAR)) {
+            if (matchTokens(Symbol.NAME, Symbol.SELF, Symbol.LEFTPAR, Symbol.NUM)) {
                 param.setVarargslist(varargslist());
             }
 
@@ -573,25 +590,38 @@ public class Compiler {
 
     private Fpdef fpdef() {
         /*
-         * fpdef: NAME | SELF | '(' fplist ')'
+         * fpdef: NAME | SELF | '(' fplist ')' | NUMBER
          */
 
         Fpdef f = new Fpdef();
 
         if (matchTokens(Symbol.NAME, Symbol.SELF)) {
+            if (matchTokens(Symbol.NAME)) {
+                f.setToName();
+            } else {
+                f.setToSelf();
+            }
+            
+            // obs: self eh guardado como se fosse um Name
             Name name = new Name(lexer.getStringValue());
             f.setName(name);
             lexer.nextToken();
         } else if (matchTokens(Symbol.LEFTPAR)) {
             lexer.nextToken();
+            f.setToFplist();
             f.setFplist(fplist());
             if (matchTokens(Symbol.RIGHTPAR)) {
                 lexer.nextToken();
             } else {
                 error.show("')' expected after fplist.");
             }
+        } else if (matchTokens(Symbol.NUM)) {
+            PyNumber number = new PyNumber(lexer.getNumberValue());
+            f.setToNumber();
+            f.setNumber(number);
+            lexer.nextToken();
         } else {
-            error.show("NAME, 'self' or '(' expected in fpdef.");
+            error.show("NAME, NUMBER, 'self' or '(' expected in fpdef.");
         }
 
         return f;
@@ -664,13 +694,12 @@ public class Compiler {
 
     private Test test() {
         /*
-         * test: or_test ['if' or_test 'else' test]
+         * test: or_test ['if' or_test 'else' test] 
          */
 
         Test test = new Test();
 
         test.setOrtest(or_test());
-
         if (matchTokens(Symbol.IF)) {
             lexer.nextToken();
             test.setIfortest(or_test());
@@ -679,9 +708,10 @@ public class Compiler {
                 lexer.nextToken();
                 test.setElsetest(test());
             } else {
-                error.show("'else' expected after or_test in test.");
+                error.show("'else' expected after orTest in test.");
             }
         }
+
 
         return test;
     }
@@ -943,7 +973,7 @@ public class Compiler {
 
     private Atom atom() {
         /*
-         * atom: '[' [listmaker] ']' | NAME | NUMBER | STRING+ | ('self' '.' NAME)
+         * atom: '[' [listmaker] ']' | NAME [ parameters | ('.' NAME parameters) ] | NUMBER | STRING+ | ('self' '.' NAME) | ( ['int' | 'float'] '(' test ')' )
          */
 
         Atom atom = new Atom();
@@ -953,7 +983,7 @@ public class Compiler {
             if (!matchTokens(Symbol.RIGHTCURBRACKET)) {
                 atom.setToListmaker(); // identifica que o atom eh um listmaker
                 atom.setListmaker(listmaker());
-                if (!matchTokens(Symbol.RIGHTCURBRACKET)){
+                if (!matchTokens(Symbol.RIGHTCURBRACKET)) {
                     error.show("']' expected after listmaker in atom.");
                 }
             } else {
@@ -964,6 +994,20 @@ public class Compiler {
             Name name = new Name(lexer.getStringValue());
             atom.setName(name);
             lexer.nextToken();
+            if (matchTokens(Symbol.LEFTPAR)) {
+                atom.setParameters(parameters());
+            } else if (matchTokens(Symbol.DOT)) {
+                lexer.nextToken();
+                atom.setToFunc(); // indica que eh uma chamada de funcao (por ex, a.get())
+                Name funcName = new Name(lexer.getStringValue());
+                atom.setFuncName(funcName);
+                lexer.nextToken();
+                if (matchTokens(Symbol.LEFTPAR)) {
+                    atom.setParameters(parameters());
+                } else {
+                    error.show("'(' expected after '.'");
+                }
+            }
         } else if (matchTokens(Symbol.NUM)) {
             PyNumber number = new PyNumber(lexer.getNumberValue());
             atom.setToNumber(); // identifica que eh um NUMBER
@@ -991,8 +1035,38 @@ public class Compiler {
             } else {
                 error.show("'.' expected after self in Atom.");
             }
+        } else if (matchTokens(Symbol.INT, Symbol.FLOAT)) {
+            if (matchTokens(Symbol.INT)) {
+                atom.setToIntCast();
+            } else {
+                atom.setToFloatCast();
+            }
+            
+            lexer.nextToken();
+
+            if (matchTokens(Symbol.LEFTPAR)) {
+                lexer.nextToken();
+                atom.setParTest(test());
+                if (matchTokens(Symbol.RIGHTPAR)) {
+                    lexer.nextToken();
+                } else {
+                    error.show("')' expected after test.");
+                }
+
+            } else {
+                error.show("'(' expected after 'int' or 'float' keyword.");
+            }
+            
+        } else if (matchTokens(Symbol.LEFTPAR)) {
+            lexer.nextToken();
+            atom.setParTest(test());
+            if (matchTokens(Symbol.RIGHTPAR)) {
+                lexer.nextToken();
+            } else {
+                error.show("')' expected after test.");
+            }
         } else {
-            error.show("Listmaker, NAME, NUMBER, STRING or SELF expected in Atom.");
+            error.show("Listmaker, NAME, NUMBER, STRING, SELF, 'int', 'float' or '(' expected in Atom.");
         }
 
         return atom;

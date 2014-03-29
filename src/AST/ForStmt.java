@@ -38,19 +38,19 @@ public class ForStmt extends CompoundStmt {
         this.elseSuite = elseSuite;
     }
 
-    public int getNumber1() {
+    public double getNumber1() {
         return number1;
     }
 
-    public void setNumber1(int number1) {
+    public void setNumber1(double number1) {
         this.number1 = number1;
     }
 
-    public int getNumber2() {
+    public double getNumber2() {
         return number2;
     }
 
-    public void setNumber2(int number2) {
+    public void setNumber2(double number2) {
         this.number2 = number2;
     }
 
@@ -74,6 +74,6 @@ public class ForStmt extends CompoundStmt {
     private Atom atom;
     private Suite suite;
     private Suite elseSuite;
-    private int number1;
-    private int number2;
+    private double number1;
+    private double number2;
 }

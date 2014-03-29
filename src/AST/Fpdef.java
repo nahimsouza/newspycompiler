@@ -5,20 +5,20 @@ package AST;
 
 public class Fpdef {
 
-    public boolean isName() {
-        return isName;
-    }
-
-    public void setName(boolean isName) {
-        this.isName = isName;
-    }
-
     public Name getName() {
         return name;
     }
 
     public void setName(Name name) {
         this.name = name;
+    }
+
+    public PyNumber getNumber() {
+        return number;
+    }
+
+    public void setNumber(PyNumber number) {
+        this.number = number;
     }
 
     public Fplist getFplist() {
@@ -28,6 +28,23 @@ public class Fpdef {
     public void setFplist(Fplist fplist) {
         this.fplist = fplist;
     }
+    
+    public void setToName(){
+        this.tipo = "name";
+    }
+    
+    public void setToFplist(){
+        this.tipo = "fplist";
+    }
+    
+    public void setToSelf(){
+        this.tipo = "self";
+    }
+        
+    public void setToNumber() {
+        this.tipo = "number";
+    }
+
 
     public void genC(int tabs) {
 //        String x = "";
@@ -44,7 +61,10 @@ public class Fpdef {
 //        }
     }
 
-    private boolean isName; //else eh fplist
     private Name name;
     private Fplist fplist;
+    private String tipo;
+    private PyNumber number;
+
+    
 }

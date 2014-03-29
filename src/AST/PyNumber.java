@@ -5,15 +5,15 @@ package AST;
 
 public class PyNumber {
 
-    public PyNumber(int n) {
+    public PyNumber(double n) {
         number = n;
     }
 
-    public int getNumber() {
+    public double getNumber() {
         return number;
     }
 
-    public void setNumber(int number) {
+    public void setNumber(double number) {
         this.number = number;
     }
 
@@ -27,5 +27,5 @@ public class PyNumber {
 //        System.out.println(x + this.getClass().getName() + ": " + number);
     }
 
-    private int number;
+    private double number;
 }

@@ -6,9 +6,14 @@ simple_stmt: small_stmt (';' small_stmt)* NEWLINE
 small_stmt: (expr_stmt | print_stmt  | flow_stmt)
 
 expr_stmt: targetlist augassign listmaker
-augassign: ('=' | '+=' | '-=' | '*=' | '/=' | '%=' | '&=' | '|=' | '^=')
+
+OLD: augassign: ('=' | '+=' | '-=' | '*=' | '/=' | '%=' | '&=' | '|=' | '^=')
+NEW: augassign: ('=' | '+=' | '-=' | '*=' | '/=' | '%=' | '&=' | '|=' | '^=' | '.')
+
 targetlist = target ("," target)* 
-target = NAME
+
+OLD: target = NAME
+NEW: target = NAME | ('self' '.' NAME)
 
 # For normal assignments, additional restrictions enforced by the interpreter
 print_stmt: 'print' ( test (',' test)* )
@@ -56,7 +61,7 @@ term: factor (('*'|'/'|'%'|'//') factor)*
 factor: ('+'|'-'|'~') factor | atom
 
 OLD: atom: '[' [listmaker] ']' | NAME | NUMBER | STRING+
-NEW: atom: '[' [listmaker] ']' | NAME | NUMBER | STRING+ | ('self' '.' NAME)
+NEW: atom: '[' [listmaker] ']' | NAME [parameters | ('.' NAME parameters) ] | NUMBER | STRING+ | ('self' '.' NAME)atom: '[' [listmaker] ']' | NAME [ parameters | ('.' NAME parameters) ] | NUMBER | STRING+ | ('self' '.' NAME) | ( ['int' | 'float'] '(' test ')' )
 
 listmaker: test (',' test)* 
 
@@ -75,8 +80,10 @@ $ importante: estamos considerando apenas '\t' como indentacao
 $ as alteracoes na gramatica estao indicadas por OLD/NEW
 
 $ Por que tinha mudado isso?? >> term: factor (('*'|'/'|'%'|'//') (('int'|'float') '(' arith_expr ')' | factor))*
+    >> por causa da linha 6 do teste ok1
+    >> ficou diferente dessa vez: ... 
 
-$ consideramos numeros com valor maximo 32767, apenas pq já tinha isso no codigo
+$ consideramos numeros com valor maximo 32767 (e minimo -32767), apenas pq já tinha isso no codigo
 
 $ conferir depois no Lexer, pois esta considerando apenas o NEQC '!=', conferir se nao dá erro qndo tem algo '!true' por exemplo
 
@@ -101,6 +108,10 @@ $ coloquei como 'error.show("Unexpected error in ...")' nos erros que NAO DEVEM 
 $ em varargslist, precisa conferir se a ordem dos parametros esta sendo guardada corretamente
     >> isso vale para todas os ArrayList por causa do genC (?)
 
+$ ver em Fpdef se guardar o SELF como se fosse NAME vai dar erro no genC.
+
+$ adicionei 'int' e 'float' como palavras chave
+
 =====================================================
 
 Análise Semântica (TO DO):
@@ -121,7 +132,8 @@ Análise Semântica (TO DO):
         4.1 - nao pode somar/subtrair/mult/div/etc... um inteiro com uma string
         4.2 - comparacoes só podem ser feitas com tipos iguais (algumas só com inteiros: >=, <=, etc)
     5. verificar nomes invalidos de variaveis (por ex, comecando com numero: 3var = 2)
-
+    6. verificar se esta chamando uma funcao que pertence àquela classe (a.getX())
+    7. verificar quantidade e tipo de parametros nas chamadas das funções
 
 
 *** precisa ver nos testes depois, se falta alguma analise semantica.

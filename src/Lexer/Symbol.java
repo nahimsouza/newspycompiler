@@ -76,5 +76,7 @@ public class Symbol {
             EC = 56, // "&"
             STRING = 57,
             DOT = 58, // .
+            INT = 59, // 'int'
+            FLOAT = 60, // 'float'
             LastSymbol = 99;
 }

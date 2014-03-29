@@ -12,6 +12,14 @@ public class Target {
     public void setName(Name name) {
         this.name = name;
     }
+    
+    public void setToName(){
+        this.tipo = "name";
+    }
+    
+    public void setToSelf(){
+        this.tipo = "self";
+    }
 
     public void genC(int tabs) {
 //        String x = "";
@@ -25,4 +33,5 @@ public class Target {
     }
 
     private Name name;
+    private String tipo;
 }

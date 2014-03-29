@@ -25,7 +25,9 @@ public class Lexer {
 
     private String stringValue;
     // private String literalStringValue;
-    private int numberValue;
+    private double numberValue;
+    private String numberType;
+    
     private int tokenPos;
 
     //  input[lastTokenPos] is the last character of the last token found
@@ -69,6 +71,8 @@ public class Lexer {
         keywordsTable.put("self", Symbol.SELF);
         keywordsTable.put("not", Symbol.NOT);
         keywordsTable.put("is", Symbol.IS);
+        keywordsTable.put("int", Symbol.INT);
+        keywordsTable.put("float", Symbol.FLOAT);
     }
 
     // =========================================================
@@ -198,21 +202,34 @@ public class Lexer {
             } else if (Character.isDigit(input[tokenPos])) {
                 // caso encontre um numero
                 String number = "";
-                while (Character.isDigit(input[tokenPos])) {
+                while (Character.isDigit(input[tokenPos]) || input[tokenPos] == '.') {
                     number += input[tokenPos];
                     tokenPos++;
                 }
 
+                if (Character.isLetter(input[tokenPos])) {
+                    error.show("Number followed by a letter", true);
+                }
+
                 // encontrou um numero verifica se eh um inteiro valido
                 token = Symbol.NUM;
+                
+                // Baseado em Angiolucci & Marucci
                 try {
-                    numberValue = Integer.valueOf(number.toString()).intValue();
-                } catch (NumberFormatException e) {
-                    error.show("Number out of limits");
+                    Integer temp = Integer.parseInt(number.toString());
+                    numberValue = temp.doubleValue();
+                    numberType = "int";
+                } catch (NumberFormatException ex1) {
+                    try {
+                        numberValue = Float.parseFloat(number.toString());
+                        numberType = "float";
+                    } catch (NumberFormatException ex2) {
+                        error.show("Value: " + numberValue + " is an invalid number.", true);
+                    }
                 }
 
                 // MaxValueInteger = 32767 - nao tinha na especificacao, deixei pq ja tinha no codigo 
-                if (numberValue >= MaxValueInteger) {
+                if (numberValue >= MaxValueInteger || numberValue <= -MaxValueInteger) {
                     error.show("Number out of limits");
                 }
             } else if (input[tokenPos] == '\'' || input[tokenPos] == '"') {
@@ -444,11 +461,17 @@ public class Lexer {
         return stringValue;
     }
 
-    public int getNumberValue() {
+    public double getNumberValue() {
         return numberValue;
     }
+    
+    public String getNumberType() {
+        return numberType;
+    }
 
+    
 //    public String getLiteralStringValue() {
 //        return literalStringValue;
 //    }
+    
 }
