@@ -38,7 +38,7 @@ public class Classdef extends CompoundStmt{
         pw.print("\ntypedef struct _St_" + name.getName() + " {");
         pw.print("\n\tFunc *vt; \n\t} " + "_class_" + name.getName() + ";");
         
-        pw.print("\n\n\tclass_" + name.getName() + " *new_A(void); \n");
+        pw.print("\n\n\tclass_" + name.getName() + " *new_" + name.getName() + "(void); \n");
         
         
         List<Stmt> stmts = this.getSuite().getStmts();
