@@ -45,12 +45,29 @@ public class Fpdef {
         this.tipo = "number";
     }
 
+    public String getTipo() {
+        return tipo;
+    }
 
+    public void setTipo(String tipo) {
+        this.tipo = tipo;
+    }
+
+    public String getClassname() {
+        return classname;
+    }
+
+    public void setClassname(String classname) {
+        this.classname = classname;
+    }
+
+    
+    
     public void genC(PW pw) {
         if (tipo.equals("name")){
             this.name.genC(pw);
         } else if (tipo.equals("self")) {
-            pw.print("_class_CN *this");
+            pw.print("_class_"+ classname +" *this");
         } else if (tipo.equals("fplist")) {
             fplist.genC(pw);
         } else if (tipo.equals("number")) {
@@ -62,6 +79,7 @@ public class Fpdef {
     private Fplist fplist;
     private String tipo;
     private PyNumber number;
+    private String classname;
 
     
 }

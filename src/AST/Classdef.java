@@ -40,6 +40,25 @@ public class Classdef extends CompoundStmt{
         
         pw.print("\n\n\tclass_" + name.getName() + " *new_A(void); \n");
         
+        
+        List<Stmt> stmts = this.getSuite().getStmts();
+        if (stmts != null) {
+            for (Stmt stmt : stmts) {
+                if (stmt instanceof Funcdef) {
+                    Funcdef f = (Funcdef) stmt;
+                    f.setClassname(this.name.getName());
+                    if (f.getParameters() != null) {
+                        List<Fpdef> fpdefs = f.getParameters().getVarargslist().getFpdefs();
+                        for (Fpdef fpdef : fpdefs) {
+                            fpdef.setClassname(this.name.getName());
+                        }
+                    }
+                }
+            }
+        }
+        
+        
+        
         // OBS: suite coloca identacao e imprime {}
         pw.print(" ");
         if (this.suite != null) {
@@ -47,7 +66,6 @@ public class Classdef extends CompoundStmt{
         }
         
         // Adicionar uma lista de metodos na classe
-        List<Stmt> stmts = this.getSuite().getStmts();
         if (stmts != null) {
             for (Stmt stmt : stmts) {
                 if (stmt instanceof Funcdef) {

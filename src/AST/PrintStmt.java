@@ -40,7 +40,7 @@ public class PrintStmt extends SmallStmt {
             } else if (testType.equalsIgnoreCase("int") || testType.equalsIgnoreCase("intCast")) {
                 format = " %d";
             } else {
-                format = testType;
+                format = "%d";
             }
             pw.print(format);
         }

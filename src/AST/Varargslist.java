@@ -21,6 +21,22 @@ public class Varargslist {
         this.fpdefs.add(f);
     }
 
+    public List<Fpdef> getFpdefs() {
+        return fpdefs;
+    }
+
+    public void setFpdefs(List<Fpdef> fpdefs) {
+        this.fpdefs = fpdefs;
+    }
+
+    public List<Test> getTests() {
+        return tests;
+    }
+
+    public void setTests(List<Test> tests) {
+        this.tests = tests;
+    }
+   
     public void genC(PW pw) {
         
         this.fpdefs.get(0).genC(pw);

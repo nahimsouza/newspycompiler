@@ -29,8 +29,18 @@ public class Funcdef extends CompoundStmt {
         this.suite = suite;
     }
 
+    public String getClassname() {
+        return classname;
+    }
+
+    public void setClassname(String classname) {
+        this.classname = classname;
+    }
+    
+    
+
     public void genC(PW pw) {
-        pw.print("void _CN_" + name.getName() + "(");
+        pw.print("void _" + classname + "_" + name.getName() + "(");
         if (this.parameters.getVarargslist() != null) {
             parameters.genC(pw);
         }
@@ -45,4 +55,5 @@ public class Funcdef extends CompoundStmt {
     private Name name;
     private Parameters parameters;
     private Suite suite;
+    private String classname;
 }

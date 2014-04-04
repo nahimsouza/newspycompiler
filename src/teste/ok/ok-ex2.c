@@ -14,10 +14,10 @@ typedef struct _St_A {
      {
 
     _i    =    0.0    ;     
-    void _CN_get(    _class_CN *this    )         {
+    void _A_get(    _class_A *this    )         {
 
       return       this->_CN      _i      ;    }
-    void _CN_put(    _class_CN *this    ,     _p_i    )         {
+    void _A_put(    _class_A *this    ,     _p_i    )         {
 
       this->_CN_      _i      =      _p_i      ;       
     }
@@ -48,20 +48,20 @@ typedef struct _St_B {
 
     _num    =    0.0    ;     
     _a    =    _A    (    )    ;     
-    void _CN_put(    _class_CN *this    ,     _n    )         {
+    void _B_put(    _class_B *this    ,     _n    )         {
 
       this->_CN_      _num      =      _n      ;       
       _a      ->vt[      _put      ]      (      _a      ,       _n      )      ;       
     }
-    void _CN_write(    _class_CN *this    )         {
+    void _B_write(    _class_B *this    )         {
 
-      printf(      "      self      func      "      ,       this->_CN      _num      ,       _a      ->vt[      _get      ]      (      _a      ,       )      );
+      printf(      "      %d      %d      "      ,       this->_CN      _num      ,       _a      ->vt[      _get      ]      (      _a      ,       )      );
     }
-    void _CN_inc(    _class_CN *this    )         {
+    void _B_inc(    _class_B *this    )         {
 
       this->_CN_      _num      +=      this->_CN      _num      ;       
     }
-    void _CN_getNum(    _class_CN *this    )         {
+    void _B_getNum(    _class_B *this    )         {
 
       return       this->_CN      _num      ;    }
   }
@@ -90,7 +90,7 @@ _class_B *new_B()
   _b  ->vt[  _put  ]  (  _b  ,   2.0  )  ;   
   _b  ->vt[  _inc  ]  (  _b  )  ;   
   _b  ->vt[  _write  ]  (  _b  )  ;   
-  printf(  "  func  "  ,   _b  ->vt[  _getNum  ]  (  _b  ,   )  );
+  printf(  "  %d  "  ,   _b  ->vt[  _getNum  ]  (  _b  ,   )  );
    
   return 0;
 }
