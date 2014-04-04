@@ -16,6 +16,10 @@ public class SimpleStmt extends Stmt {
         this.smallStmts.add(stmt);
     }
 
+    public List<SmallStmt> getSmallStmts() {
+        return smallStmts;
+    }
+    
     public void genC(PW pw) {
 
         for (SmallStmt smallStmt : smallStmts) {

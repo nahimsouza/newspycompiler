@@ -3,12 +3,14 @@
  */
 package AST;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 public class Classdef extends CompoundStmt{
 
     public Classdef() {
-        this.atoms = new ArrayList<Atom>();
+        this.atoms = new LinkedList<Atom>();
+        this.functions = new LinkedList<Funcdef>();
     }
 
     public void addAtom(Atom a) {
@@ -32,30 +34,52 @@ public class Classdef extends CompoundStmt{
     }
     
     public void genC(PW pw){
-// GenC do Vinicius, apenas como base, precisa verificar arrumar algumas coisas
         
-//        pw.print("typedef struct ");
-//        this.name.genC(pw);
-//        pw.println("{");
-//        // if (this.name != null){
-//        //     this.name.genC(pw);
-//        // }
-//        
-//        for (int i = 0; i < this.atoms.size(); i++){
-//            this.atoms.get(i).genC(pw);
-//            pw.println(";");
-//        }
-//        pw.print("}");
-//        this.name.genC(pw);
-//        pw.println(";");
-//
-//        
-//        if (this.suite != null)
-//            this.suite.genC(pw);
+        pw.print("\ntypedef struct _St_" + name.getName() + " {");
+        pw.print("\n\tFunc *vt; \n\t} " + "_class_" + name.getName() + ";");
+        
+        pw.print("\n\n\tclass_" + name.getName() + " *new_A(void); \n");
+        
+        // OBS: suite coloca identacao e imprime {}
+        pw.print(" ");
+        if (this.suite != null) {
+            suite.genC(pw);
+        }
+        
+        // Adicionar uma lista de metodos na classe
+        List<Stmt> stmts = this.getSuite().getStmts();
+        if (stmts != null) {
+            for (Stmt stmt : stmts) {
+                if (stmt instanceof Funcdef) {
+                    functions.add((Funcdef) stmt);
+                }
+            }
+        }
+        
+        if (functions.size() > 0) {
+            pw.print("\n\nFunc VTclass_" + name.getName() + "[] = {\n\t");
+            
+            pw.print("( void (*)() ) _" + name.getName() + "_" + functions.get(0).getName().getName());
+            for (int i = 1; i < functions.size(); i++) {
+                pw.print(",");
+                pw.print("( void (*)() ) _" + name.getName() + "_" + functions.get(i).getName().getName());
+            }
+            pw.print("\n");
+            pw.print("};\n\n");
+            
+            
+            pw.print("\n\n_class_" + name.getName() + " *new_" + name.getName() + "()\n" + "{\n" + " _class_" + name.getName() + " *t;\n");
+            pw.print("  if ( (t = malloc(sizeof(_class_" + name.getName() + "))) != NULL )\n\t");
+            pw.print("t->vt = VTclass_" + name.getName() + ";");
+            pw.print("\n");
+            pw.print("return t;\n } \n\n"); 
+        }
+        
     }
 
     private Name name;
-    private ArrayList<Atom> atoms;
+    private LinkedList<Atom> atoms;
     private Suite suite;
+    private LinkedList<Funcdef> functions;
 
 }
