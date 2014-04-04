@@ -1,5 +1,5 @@
 /*
-* Funcdef: armazena um NAME os PARAMETERS e um Suite
+ * Funcdef: armazena um NAME os PARAMETERS e um Suite
  */
 package AST;
 
@@ -29,20 +29,31 @@ public class Funcdef extends CompoundStmt {
         this.suite = suite;
     }
 
-    public void genC(int tabs) {
-//        String x = "";
-//        int tab = tabs;
-//        while (tabs != 0) {
-//            x = x.concat("  ");
-//            tabs--;
-//        }
-//        System.out.println(x + this.getClass().getName());
-//        name.genC(tab + 1);
-//        parameters.genC(tab + 1);
-//        suite.genC(tab + 1);
+    public String getClassname() {
+        return classname;
+    }
+
+    public void setClassname(String classname) {
+        this.classname = classname;
+    }
+    
+    
+
+    public void genC(PW pw) {
+        pw.print("void _" + classname + "_" + name.getName() + "(");
+        if (this.parameters.getVarargslist() != null) {
+            parameters.genC(pw);
+        }
+        pw.print(")");
+        
+        pw.print(" ");
+        if (this.suite != null) {
+            suite.genC(pw);
+        }
     }
 
     private Name name;
     private Parameters parameters;
     private Suite suite;
+    private String classname;
 }

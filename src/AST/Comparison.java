@@ -47,7 +47,7 @@ public class Comparison {
 
     public void genC(PW pw) {
         expr.genC(pw);
-        for(int i = 1; i < this.compOps.size(); i++){
+        for(int i = 0; i < this.compOps.size(); i++){
             compOps.get(i).genC(pw);
             exprs.get(i).genC(pw);
         }            

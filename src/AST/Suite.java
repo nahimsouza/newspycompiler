@@ -33,18 +33,24 @@ public class Suite {
         this.simplestmt = simplestmt;
     }
 
+    public List<Stmt> getStmts() {
+        return stmts;
+    }
+
     public void genC(PW pw) {
 
         if (isSimpleStmt) {
             this.simplestmt.genC(pw);
         } else {
+            pw.println("{\n");
             for (Stmt stmt : stmts) {
-                pw.println("{\n");
+
                 pw.add();
                 stmt.genC(pw);
                 pw.sub();
-                pw.println("}");
+
             }
+            pw.println("}");
         }
     }
 

@@ -18,6 +18,7 @@ import AST.*;
 import Lexer.*;
 import java.io.PrintWriter;
 import java.util.LinkedList;
+import java.util.List;
 
 public class Compiler {
 
@@ -703,7 +704,7 @@ public class Compiler {
                     error.show("')' expected before ':' in class definition.");
                 }
             }
-
+            
             if (matchTokens(Symbol.COLON)) {
                 lexer.nextToken();
                 classDef.setSuite(suite());
@@ -1073,6 +1074,7 @@ public class Compiler {
 
             if (matchTokens(Symbol.LEFTPAR)) {
                 lexer.nextToken();
+                atom.setToParTest();
                 atom.setParTest(test());
                 if (matchTokens(Symbol.RIGHTPAR)) {
                     lexer.nextToken();
@@ -1086,6 +1088,7 @@ public class Compiler {
             
         } else if (matchTokens(Symbol.LEFTPAR)) {
             lexer.nextToken();
+            atom.setToParTest();
             atom.setParTest(test());
             if (matchTokens(Symbol.RIGHTPAR)) {
                 lexer.nextToken();

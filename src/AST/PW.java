@@ -42,7 +42,7 @@ public class PW {
      */
     static public final int green = 0, java = 1;
     int mode = green;
-    public int step = 3;
+    public int step = 2;
     public PrintWriter out;
     
     // Este 'space' faz a indentação funcionar magicamente. Não mude.
