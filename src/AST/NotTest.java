@@ -30,19 +30,14 @@ public class NotTest {
         this.comparison = comparison;
     }
 
-    public void genC(int tabs) {
-//        String x = "";
-//        int tab = tabs;
-//        while (tabs != 0) {
-//            x = x.concat("  ");
-//            tabs--;
-//        }
-//        System.out.println(x + this.getClass().getName());
-//        if (isNotTest) {
-//            notTest.genC(tab + 1);
-//        } else {
-//            comparison.genC(tab + 1);
-//        }
+    public void genC(PW pw) {
+        if (this.isNotTest) {
+            pw.print(" !");
+            this.notTest.genC(pw);
+        } else {
+            this.comparison.genC(pw);
+        }
+
     }
 
     private boolean isNotTest;

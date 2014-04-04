@@ -17,14 +17,8 @@ public class PyString {
         this.string = string;
     }
 
-    public void genC(int tabs) {
-//        String x = "";
-//        int tab = tabs;
-//        while (tabs != 0) {
-//            x = x.concat("  ");
-//            tabs--;
-//        }
-//        System.out.println(x + this.getClass().getName() + ": " + string);
+    public void genC(PW pw) {
+        pw.print("\"" + string + "\"");
     }
 
     private String string;

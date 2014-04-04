@@ -4,14 +4,14 @@
  */
 package AST;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 public class IfStmt extends CompoundStmt {
 
     public IfStmt() {
-        telif = new ArrayList<Test>();
-        selif = new ArrayList<Suite>();
+        telif = new LinkedList<Test>();
+        selif = new LinkedList<Suite>();
     }
 
     public void addTelif(Test telif) {
@@ -62,25 +62,24 @@ public class IfStmt extends CompoundStmt {
         this.selse = selse;
     }
 
-    public void genC(int tabs) {
-//        String x = "";
-//        int tab = tabs;
-//        while (tabs != 0) {
-//            x = x.concat("  ");
-//            tabs--;
-//        }
-//        System.out.println(x + this.getClass().getName());
-//        tif.genC(tab + 1);
-//        sif.genC(tab + 1);
-//        for (Test t : telif) {
-//            t.genC(tab + 1);
-//        }
-//        for (Suite t : selif) {
-//            t.genC(tab + 1);
-//        }
-//        if (selse != null) {
-//            selse.genC(tab + 1);
-//        }
+    public void genC(PW pw) {
+        pw.print("if(");
+        this.tif.genC(pw);
+        pw.print(")");
+        this.sif.genC(pw);
+        
+        for(int i = 0; i < this.selif.size(); i++){
+            pw.print("else if(");
+            this.telif.get(i).genC(pw);
+            pw.print(")");
+            this.selif.get(i).genC(pw);
+        }
+        
+        if (this.selse != null){
+            pw.print("else");
+            this.selse.genC(pw);
+
+        }
     }
 
     private Test tif;

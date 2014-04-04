@@ -5,15 +5,13 @@ stmt: simple_stmt | compound_stmt
 simple_stmt: small_stmt (';' small_stmt)* NEWLINE
 small_stmt: (expr_stmt | print_stmt  | flow_stmt)
 
-expr_stmt: targetlist augassign listmaker
-
-OLD: augassign: ('=' | '+=' | '-=' | '*=' | '/=' | '%=' | '&=' | '|=' | '^=')
-NEW: augassign: ('=' | '+=' | '-=' | '*=' | '/=' | '%=' | '&=' | '|=' | '^=' | '.')
+expr_stmt: targetlist [augassign listmaker]
+augassign: ('=' | '+=' | '-=' | '*=' | '/=' | '%=' | '&=' | '|=' | '^=')
 
 targetlist = target ("," target)* 
 
 OLD: target = NAME
-NEW: target = NAME | ('self' '.' NAME)
+NEW: target = NAME | ('self' '.' NAME) | (NAME '.' NAME parameters)
 
 # For normal assignments, additional restrictions enforced by the interpreter
 print_stmt: 'print' ( test (',' test)* )
@@ -61,7 +59,7 @@ term: factor (('*'|'/'|'%'|'//') factor)*
 factor: ('+'|'-'|'~') factor | atom
 
 OLD: atom: '[' [listmaker] ']' | NAME | NUMBER | STRING+
-NEW: atom: '[' [listmaker] ']' | NAME [parameters | ('.' NAME parameters) ] | NUMBER | STRING+ | ('self' '.' NAME)atom: '[' [listmaker] ']' | NAME [ parameters | ('.' NAME parameters) ] | NUMBER | STRING+ | ('self' '.' NAME) | ( ['int' | 'float'] '(' test ')' )
+NEW: atom: '[' [listmaker] ']' | NAME [ parameters | ('.' NAME parameters) ] | NUMBER | STRING+ | ('self' '.' NAME) | ( ['int' | 'float'] '(' test ')' )
 
 listmaker: test (',' test)* 
 

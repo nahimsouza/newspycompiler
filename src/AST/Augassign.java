@@ -17,15 +17,8 @@ public class Augassign {
         this.op = op;
     }
 
-    public void genC(int tabs) {
-//        String x = "";
-//        int tab = tabs;
-//        while (tabs != 0) {
-//            x = x.concat("  ");
-//            tabs--;
-//        }
-//        System.out.println(x + this.getClass().getName());
-//        System.out.println(x + "  " + op);
+    public void genC(PW pw) {
+        pw.print(op);
     }
 
     private String op;

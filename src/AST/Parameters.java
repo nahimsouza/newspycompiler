@@ -13,15 +13,10 @@ public class Parameters {
         this.varargslist = varargslist;
     }
 
-    public void genC(int tabs) {
-//        String x = "";
-//        int tab = tabs;
-//        while (tabs != 0) {
-//            x = x.concat("  ");
-//            tabs--;
-//        }
-//        System.out.println(x + this.getClass().getName());
-//        varargslist.genC(tab + 1);
+    public void genC(PW pw) {
+        if (this.varargslist != null) {
+            this.varargslist.genC(pw);
+        }
     }
 
     private Varargslist varargslist;

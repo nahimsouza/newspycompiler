@@ -29,19 +29,17 @@ public class WhileStmt extends CompoundStmt {
         this.esuite = esuite;
     }
 
-    public void genC(int tabs) {
-//        String x = "";
-//        int tab = tabs;
-//        while (tabs != 0) {
-//            x = x.concat("  ");
-//            tabs--;
-//        }
-//        System.out.println(x + this.getClass().getName());
-//        test.genC(tab + 1);
-//        suite.genC(tab + 1);
-//        if (esuite != null) {
-//            esuite.genC(tab + 1);
-//        }
+    public void genC(PW pw) {
+        pw.print("while ( ");
+        this.test.genC(pw);
+        pw.print(")");
+        this.suite.genC(pw);
+                
+        // while-else
+        if (this.esuite != null) {
+            pw.print("if (!(" + test + "))");
+            this.esuite.genC(pw);
+        }
     }
 
     private Test test;

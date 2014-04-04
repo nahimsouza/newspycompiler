@@ -33,21 +33,19 @@ public class Suite {
         this.simplestmt = simplestmt;
     }
 
-    public void genC(int tabs) {
-//        String x = "";
-//        int tab = tabs;
-//        while (tabs != 0) {
-//            x = x.concat("  ");
-//            tabs--;
-//        }
-//        System.out.println(x + this.getClass().getName());
-//        if (isSimpleStmt) {
-//            simplestmt.genC(tab + 1);
-//        } else {
-//            for (Stmt s : stmts) {
-//                s.genC(tab + 1);
-//            }
-//        }
+    public void genC(PW pw) {
+
+        if (isSimpleStmt) {
+            this.simplestmt.genC(pw);
+        } else {
+            for (Stmt stmt : stmts) {
+                pw.println("{\n");
+                pw.add();
+                stmt.genC(pw);
+                pw.sub();
+                pw.println("}");
+            }
+        }
     }
 
     private List<Stmt> stmts;

@@ -39,26 +39,15 @@ public class Factor {
         this.atom = atom;
     }
 
-    public void genC(int count) {
-//        String str = "";
-//        int aux_c = count;
-//
-//        while (count != 0) {
-//            str = str.concat("  ");
-//            count--;
-//        }
-//
-//        System.out.println(str + this.getClass().getName());
-//
-//        aux_c++;
-//
-//        if (isFactor) {
-//            factor.genC(aux_c);
-//            str = str.concat("  ");
-//            System.out.println(str + this.getClass().getName());
-//        } else {
-//            atom.genC(aux_c);
-//        }
+    public void genC(PW pw) {
+
+        if (isFactor) {
+            pw.print(op);
+            this.factor.genC(pw);
+        } else {
+            atom.genC(pw);
+        }
+        
     }
 
     private boolean isFactor; //se eh factor ou atom

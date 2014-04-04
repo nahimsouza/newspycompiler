@@ -3,33 +3,26 @@
  */
 package AST;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 public class Listmaker {
 
     public Listmaker() {
-        this.tests = new ArrayList<Test>();
+        this.tests = new LinkedList<Test>();
     }
 
     public void addTest(Test t) {
         this.tests.add(t);
     }
 
-    public void genC(int count) {
-//        String str = "";
-//        int aux_c = count;
-//
-//        while(count != 0){
-//            str = str.concat("  ");
-//            count--;
-//        }
-//        
-//        System.out.println(str + this.getClass().getName());
-//        aux_c++;
-//        for(Test t: tests){
-//            t.genC(aux_c);
-//        }
+    public void genC(PW pw) {
+                
+        this.tests.get(0).genC(pw);
+        for(int i = 1; i < this.tests.size(); i++){
+            pw.print(", ");    
+            this.tests.get(i).genC(pw);
+        }
     }
 
     private List<Test> tests;

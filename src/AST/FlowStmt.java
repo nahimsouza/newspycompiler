@@ -5,7 +5,7 @@ package AST;
 
 abstract public class FlowStmt extends SmallStmt {
 
-    public void genC(int tabs) {
+    public void genC(PW pw) {
 
     }
 }

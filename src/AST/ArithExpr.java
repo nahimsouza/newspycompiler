@@ -3,31 +3,26 @@
  */
 package AST;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 public class ArithExpr {
 
     public ArithExpr() {
-        this.terms = new ArrayList<Term>();
-        this.ops = new ArrayList<String>();
+        this.terms = new LinkedList<Term>();
+        this.ops = new LinkedList<String>();
     }
 
-    public void genC(int tabs) {
-//        String x = "";
-//        int tab = tabs;
-//        while (tabs != 0) {
-//            x = x.concat("  ");
-//            tabs--;
-//        }
-//        System.out.println(x + this.getClass().getName());
-//        term.genC(tab + 1);
-//        for (Term t : terms) {
-//            t.genC(tab + 1);
-//        }
-//        for (String s : ops) {
-//            System.out.println(x + "  " + s.toString());
-//        }
+    public void genC(PW pw) {
+
+//        pw.print("(");
+        this.term.genC(pw);
+        for(int i = 0; i < this.terms.size(); i++){
+            pw.print( ops.get(i));    
+            this.terms.get(i).genC(pw);
+        }
+//        pw.print(")");
+
     }
 
     public void addTerm(Term t) {
@@ -44,6 +39,14 @@ public class ArithExpr {
 
     public void setTerm(Term term) {
         this.term = term;
+    }
+
+    public List<Term> getTerms() {
+        return terms;
+    }
+
+    public List<String> getOps() {
+        return ops;
     }
 
     private Term term;

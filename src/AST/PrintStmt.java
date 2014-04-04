@@ -3,13 +3,13 @@
  */
 package AST;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 public class PrintStmt extends SmallStmt {
 
     public PrintStmt() {
-        this.tests = new ArrayList<Test>();
+        this.tests = new LinkedList<Test>();
     }
 
     public List<Test> getTests() {
@@ -24,19 +24,37 @@ public class PrintStmt extends SmallStmt {
         tests.add(test);
     }
 
-    public void genC(int tabs) {
-//        String x = "";
-//        int tab = tabs;
-//        while (tabs != 0) {
-//            x = x.concat("  ");
-//            tabs--;
-//        }
-//        System.out.println(x + this.getClass().getName());
-//        for (Test t : tests) {
-//            t.genC(tab + 1);
-//        }
+    public void genC(PW pw) {
+        pw.print("printf(");
+        pw.print("\"");
+        for (int i = 0; i < this.tests.size(); i++) {
+            this.tests.get(i).verifyType();
+            String testType = this.tests.get(i).getTipo();
+            String format = null;
+            if (testType.equalsIgnoreCase("bool")) {
+                format = " %d";
+            } else if (testType.equalsIgnoreCase("number") || testType.equalsIgnoreCase("floatCast")) {
+                format = " %f";
+            } else if (testType.equalsIgnoreCase("string") || testType.equalsIgnoreCase("name")) {
+                format = " %s";
+            } else if (testType.equalsIgnoreCase("int") || testType.equalsIgnoreCase("intCast")) {
+                format = " %d";
+            } else {
+                format = testType;
+            }
+            pw.print(format);
+        }
+        pw.print("\"");
+
+        for (int i = 0; i < this.tests.size(); i++) {
+            pw.print(", ");
+            this.tests.get(i).genC(pw);
+        }
+
+        pw.println(");");
     }
 
-    
+
+
     private List<Test> tests;
 }

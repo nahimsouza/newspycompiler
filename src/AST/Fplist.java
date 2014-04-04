@@ -16,18 +16,12 @@ public class Fplist {
         this.fpdefs.add(f);
     }
 
-    public void genC(int tabs) {
-//        String x = "";
-//        int tab = tabs;
-//        while (tabs != 0) {
-//            x = x.concat("  ");
-//            tabs--;
-//        }
-//        System.out.println(x + this.getClass().getName());
-//        for (Fpdef f : fpdefs) {
-//            f.genC(tab + 1);
-//        }
- 
+    public void genC(PW pw) {
+        this.fpdefs.get(0).genC(pw);
+        for (int i = 1; i < this.fpdefs.size(); i++) {
+            pw.print(", ");
+            this.fpdefs.get(i).genC(pw);
+        }
     }
     private List<Fpdef> fpdefs;
 }

@@ -42,7 +42,7 @@ public class ForStmt extends CompoundStmt {
         return number1;
     }
 
-    public void setNumber1(double number1) {
+    public void setNumber1(int number1) {
         this.number1 = number1;
     }
 
@@ -50,30 +50,29 @@ public class ForStmt extends CompoundStmt {
         return number2;
     }
 
-    public void setNumber2(double number2) {
+    public void setNumber2(int number2) {
         this.number2 = number2;
     }
 
-    public void genC(int tabs) {
-        // acho q vai mudar tudo isso ae...
-
-//        String x = "";
-//        int tab = tabs;
-//        while (tabs != 0) {
-//            x = x.concat("  ");
-//            tabs--;
-//        }
-//        System.out.println(x + this.getClass().getName());
-//        exprlist.genC(tab + 1);
-//        testlist.genC(tab + 1);
-//        suite.genC(tab + 1);
-//        esuite.genC(tab + 1);
+    public void genC(PW pw) {
+        // imprime o for comum: for(i=0; i<10; i++)
+        
+        String nome = name.getName();
+        pw.print("int " + nome + ";");
+        pw.print("for (" + nome + "=" + number1.toString() + "; " + nome + "<=" + number2.toString() + "; " + nome + "++");
+        if (suite != null) {
+            suite.genC(pw);
+        }
+        
+        // TODO: parte ELSE do FOR
+        // TODO: for NAME in Atom:
+        
     }
 
     private Name name;
     private Atom atom;
     private Suite suite;
     private Suite elseSuite;
-    private double number1;
-    private double number2;
+    private Integer number1;
+    private Integer number2;
 }

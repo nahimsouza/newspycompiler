@@ -10,6 +10,7 @@ public class Atom {
 
     public Atom() {
         string = new ArrayList<PyString>();
+        hasParameters = false;
     }
 
     public Listmaker getListmaker() {
@@ -72,6 +73,15 @@ public class Atom {
         this.parTest = parTest;
     }
 
+    public boolean hasParameters() {
+        return hasParameters;
+    }
+
+    public void setHasParameters(boolean hasParameters) {
+        this.hasParameters = hasParameters;
+    }
+    
+
     // Apenas armazena em tipo o que esta sendo guardado no Atom.
     public void setToName() {
         tipo = "name";
@@ -102,33 +112,84 @@ public class Atom {
     }
     
     public void setToIntCast(){
-        tipo = "intTest";
+        tipo = "intCast";
     }
     
     public void setToFloatCast(){
         tipo = "floatCast";
     }
     
-
-    public void genC(int tabs) {
-//        String x = "";
-//        int tab = tabs;
-//        while (tabs != 0) {
-//            x = x.concat("  ");
-//            tabs--;
-//        }
-//        System.out.println(x + this.getClass().getName());
-//        if (tipo.equals("testlist1")) {
-//            testlist1.genC(tab + 1);
-//        } else if (tipo.equals("name")) {
-//            name.genC(tab + 1);
-//        } else if (tipo.equals("number")) {
-//            number.genC(tab + 1);
-//        } else if (tipo.equals("string")) {
-//            for (PyString s : string) {
-//                s.genC(tab + 1);
-//            }
-//        }
+    public void genC(PW pw) {
+    
+        if (tipo.equals("name")) {
+            this.name.genC(pw);
+            if (hasParameters) {
+                pw.print("(");
+                this.parameters.genC(pw);
+                pw.print(")");
+            }
+        } else if (tipo.equals("listmaker")) {
+            this.listmaker.genC(pw);
+        } else if (tipo.equals("number")) {
+            this.number.genC(pw);
+        } else if (tipo.equals("string")) {
+            for (PyString s : string) {
+                // ver se precisa imprimir as aspas aqui
+                s.genC(pw);
+            }
+        } else if (tipo.equals("self")) {
+            /* TODO: tratar o 'self', no exemplo está assim:
+                int _A_get( _class_A *this ) {
+                     return this->_A_i;
+                }
+            */
+            
+            pw.print("this->_CN");
+            this.name.genC(pw);
+            
+        }  else if (tipo.equals("func")) {
+            /* 
+                quando eh tipo func, o nome o objeto fica guardado em name e o nome da funcao em funcName
+                a chamada a.m() deve imprimir _a->vt[0](_a); onde vt[0] indica a posicao do metodo 'm' no vetor de funcoes
+                por enqto imprimi só _a->vt[m](_a); mas depois precisa ver como fica.
+            */ 
+            this.name.genC(pw);
+            
+            pw.print("->vt[");
+            this.funcName.genC(pw);
+            pw.print("]");
+            
+            pw.print("(");
+            this.name.genC(pw);
+            if (hasParameters) {
+                pw.print(", ");
+                this.parameters.genC(pw);
+            }
+            
+            pw.print(")");
+            
+        }  else if (tipo.equals("partest")) {
+            // deve imprimir algo do tipo: (1>1)
+            pw.print("(");
+            this.parTest.genC(pw);
+            pw.print(")");
+            
+        }  else if (tipo.equals("intCast")) {
+            // deve imprimir algo do tipo (int)(1 + 1)
+            pw.print("(int)");
+            pw.print("(");
+            this.parTest.genC(pw);
+            pw.print(")");
+           
+        }  else if (tipo.equals("floatCast")) {
+            // deve imprimir algo do tipo (float)(1 + 1)
+            pw.print("(float)");
+            pw.print("(");
+            this.parTest.genC(pw);
+            pw.print(")");
+           
+        }
+        
     }
     private Listmaker listmaker;
     private Name name;
@@ -138,5 +199,6 @@ public class Atom {
     private String tipo;
     private Parameters parameters;
     private Test parTest;
+    private boolean hasParameters;
 
 }

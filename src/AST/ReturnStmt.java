@@ -17,15 +17,10 @@ public class ReturnStmt extends FlowStmt {
         this.test = test;
     }
 
-    public void genC(int tabs) {
-//        String x = "";
-//        int tab = tabs;
-//        while (tabs != 0) {
-//            x = x.concat("  ");
-//            tabs--;
-//        }
-//        System.out.println(x + this.getClass().getName());
-//        test.genC(tab + 1);
+    public void genC(PW pw) {
+        pw.print("return ");
+        this.test.genC(pw);
+        pw.print(";");
     }
 
     private Test test;

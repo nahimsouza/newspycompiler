@@ -4,14 +4,14 @@
 
 package AST;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 public class Term {
 
     public Term() {
-        this.factors = new ArrayList<Factor>();
-        this.ops = new ArrayList<String>();
+        this.factors = new LinkedList<Factor>();
+        this.ops = new LinkedList<String>();
     }
 
     public void addFactor(Factor f) {
@@ -30,29 +30,21 @@ public class Term {
         this.factor = factor;
     }
 
-    public void genC(int count) {
-//        String str = "";
-//        int aux_c = count;
-//
-//        while (count != 0) {
-//            str = str.concat("  ");
-//            count--;
-//        }
-//
-//        System.out.println(str + this.getClass().getName());
-//
-//        aux_c++;
-//
-//        factor.genC(aux_c);
-//
-//        for (Factor f : factors) {
-//            f.genC(aux_c);
-//        }
-//
-//        str = str.concat(" ");
-//        for (String o : ops) {
-//            System.out.println(str + o);
-//        }
+    public List<Factor> getFactors() {
+        return factors;
+    }
+
+    public List<String> getOps() {
+        return ops;
+    }
+    
+    public void genC(PW pw) {
+        
+        this.factor.genC(pw);
+        for(int i = 1; i < this.factors.size(); i++){
+            pw.print(ops.get(i));    
+            this.factors.get(i).genC(pw);
+        }
     }
 
     private List<Factor> factors;

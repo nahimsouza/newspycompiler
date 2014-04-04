@@ -3,14 +3,14 @@
  */
 package AST;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 public class Varargslist {
 
     public Varargslist() {
-        this.fpdefs = new ArrayList<Fpdef>();
-        this.tests = new ArrayList<Test>();
+        this.fpdefs = new LinkedList<Fpdef>();
+        this.tests = new LinkedList<Test>();
     }
 
     public void addTest(Test t) {
@@ -21,26 +21,21 @@ public class Varargslist {
         this.fpdefs.add(f);
     }
 
-    public void genC(int tabs) {
-//        String x = "";
-//        int tab = tabs;
-//        while (tabs != 0) {
-//            x = x.concat("  ");
-//            tabs--;
-//        }
-//        System.out.println(x + this.getClass().getName());
-//        for (Fpdef f : fpdefs) {
-//            f.genC(tab + 1);
-//        }
-//        for (Test t : tests) {
-//            t.genC(tab + 1);
-//        }
-//        if (name1 != null) {
-//            name1.genC(tab + 1);
-//        }
-//        if (name2 != null) {
-//            name2.genC(tab + 1);
-//        }
+    public void genC(PW pw) {
+        
+        this.fpdefs.get(0).genC(pw);
+        if (this.tests.get(0) != null) {
+            pw.print("=");
+            tests.get(0).genC(pw);
+        }
+        for (int i = 1; i < this.fpdefs.size(); i++) {
+            pw.print(", ");
+            this.fpdefs.get(i).genC(pw);
+            if (this.tests.get(i) != null) {
+                pw.print("=");
+                tests.get(i).genC(pw);
+            }
+        }
     }
 
     private List<Fpdef> fpdefs;

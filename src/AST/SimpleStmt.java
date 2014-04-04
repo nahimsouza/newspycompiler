@@ -16,22 +16,13 @@ public class SimpleStmt extends Stmt {
         this.smallStmts.add(stmt);
     }
 
-    public void genC(int tabs) {
+    public void genC(PW pw) {
 
-// Deixei comentado o codigo do Tomazella, precisa conferir
-
-//        String x = "";
-//        int tab = tabs;
-//        while (tabs != 0) {
-//            x = x.concat("  ");
-//            tabs--;
-//        }
-//        System.out.println(x + this.getClass().getName());
-//        for (SmallStmt s : smallStmts) {
-//            s.genC(tab + 1);
-//        }
+        for (SmallStmt smallStmt : smallStmts) {
+            smallStmt.genC(pw);
+        }
+        
     }
 
-    
     private List<SmallStmt> smallStmts;
 }

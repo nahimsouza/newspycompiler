@@ -3,14 +3,14 @@
  */
 package AST;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 public class Comparison {
 
     public Comparison() {
-        this.compOps = new ArrayList<CompOp>();
-        this.exprs = new ArrayList<Expr>();
+        this.compOps = new LinkedList<CompOp>();
+        this.exprs = new LinkedList<Expr>();
     }
 
     public void addCompOp(CompOp c) {
@@ -45,25 +45,12 @@ public class Comparison {
         this.exprs = exprs;
     }
 
-    public void genC(int count) {
-//        String str = "";
-//        int aux_c = count;
-//
-//        while (count != 0) {
-//            str = str.concat("  ");
-//            count--;
-//        }
-//
-//        System.out.println(str + this.getClass().getName());
-//
-//        aux_c++;
-//        expr.genC(aux_c);
-//        for (Expr e : exprs) {
-//            e.genC(aux_c);
-//        }
-//        for (CompOp c : compOps) {
-//            c.genC(aux_c);
-//        }
+    public void genC(PW pw) {
+        expr.genC(pw);
+        for(int i = 1; i < this.compOps.size(); i++){
+            compOps.get(i).genC(pw);
+            exprs.get(i).genC(pw);
+        }            
     }
 
     private Expr expr;

@@ -19,18 +19,8 @@ public class CompOp {
         this.op = op;
     }
 
-    public void genC(int count) {
-//        String str = "";
-//
-//        while (count != 0) {
-//            str = str.concat("  ");
-//            count--;
-//        }
-//
-//        System.out.println(str + this.getClass().getName());
-//
-//        str = str.concat("  ");
-//        System.out.println(str + this.getClass().getName() + op.toString());
+    public void genC(PW pw) {
+        pw.print(op);
     }
 
 }

@@ -17,7 +17,7 @@ package CompilerSPy;
 import AST.*;
 import Lexer.*;
 import java.io.PrintWriter;
-import java.util.Vector;
+import java.util.LinkedList;
 
 public class Compiler {
 
@@ -54,7 +54,7 @@ public class Compiler {
     }
 
     private Program program() {
-        Vector<Stmt> stmtList = new Vector<Stmt>();
+        LinkedList<Stmt> stmtList = new LinkedList<Stmt>();
 
         while (!matchTokens(Symbol.EOF)) {
             stmtList.add(stmt());
@@ -139,27 +139,36 @@ public class Compiler {
 
     private ExprStmt expr_stmt() {
         /*
-         * expr_stmt: targetlist augassign listmaker
+         * expr_stmt: targetlist [augassign listmaker]
+         *
+         * feito um esquema para colocar target também poder ser uma chamada de funcao
+         * por isso a segunda parte está como opcional, entre []
          */
 
         ExprStmt es = new ExprStmt();
 
         es.setTargetlist(targetlist());
-        es.setAugassign(augassign());
-        es.setListmaker(listmaker());
+        if (matchTokens(Symbol.ASSIGN, Symbol.PLUSASSIGN, Symbol.MINUSASSIGN,
+                Symbol.MULTIASSIGN, Symbol.DIVASSIGN, Symbol.MODASSIGN, Symbol.ANDASSIGN,
+                Symbol.ORASSIGN, Symbol.XORASSIGN)) {
+            es.setAugassign(augassign());
+            es.setListmaker(listmaker());
+        }
+        
+        
 
         return es;
     }
 
     private Augassign augassign() {
         /*
-         * augassign: ('=' | '+=' | '-=' | '*=' | '/=' | '%=' | '&=' | '|=' | '^=' | '.')
+         * augassign: ('=' | '+=' | '-=' | '*=' | '/=' | '%=' | '&=' | '|=' | '^=')
          */
 
         String op = "";
         if (matchTokens(Symbol.ASSIGN, Symbol.PLUSASSIGN, Symbol.MINUSASSIGN,
                 Symbol.MULTIASSIGN, Symbol.DIVASSIGN, Symbol.MODASSIGN, Symbol.ANDASSIGN,
-                Symbol.ORASSIGN, Symbol.XORASSIGN, Symbol.DOT)) {
+                Symbol.ORASSIGN, Symbol.XORASSIGN)) {
 
             if (matchTokens(Symbol.ASSIGN)) {
                 op = "=";
@@ -177,8 +186,6 @@ public class Compiler {
                 op = "&=";
             } else if (matchTokens(Symbol.ORASSIGN)) {
                 op = "|=";
-            } else if (matchTokens(Symbol.DOT)) {
-                op = ".";
             } else {
                 op = "^=";
             }
@@ -212,7 +219,7 @@ public class Compiler {
 
     private Target target() {
         /*
-         * target = NAME | ('self' '.' NAME)
+         * target = NAME | ('self' '.' NAME) | (NAME '.' NAME parameters)
          */
 
         Target target = new Target();
@@ -222,6 +229,20 @@ public class Compiler {
             target.setToName(); // define como tipo NAME
             target.setName(name);
             lexer.nextToken();
+            
+            if (matchTokens(Symbol.DOT)){
+                lexer.nextToken();
+                target.setToFunc();
+                Name funcName = new Name(lexer.getStringValue());
+                target.setFuncName(funcName);
+                lexer.nextToken();
+                if (matchTokens(Symbol.LEFTPAR)) {
+                    target.setParameters(parameters());
+                } else {
+                    error.show("'(' expected after function call.");
+                }
+            }
+            
         } else if (matchTokens(Symbol.SELF)) {
             target.setToSelf();
             lexer.nextToken();
@@ -413,13 +434,13 @@ public class Compiler {
                 if (matchTokens(Symbol.LEFTPAR)) {
                     lexer.nextToken();
                     if (matchTokens(Symbol.NUM)) {
-                        double num1 = lexer.getNumberValue();
+                        int num1 = (int) lexer.getNumberValue();
                         forStmt.setNumber1(num1);
                         lexer.nextToken();
                         if (matchTokens(Symbol.COMMA)) {
                             lexer.nextToken();
                             if (matchTokens(Symbol.NUM)) {
-                                double num2 = lexer.getNumberValue();
+                                int num2 = (int) lexer.getNumberValue();
                                 forStmt.setNumber2(num2);
                                 lexer.nextToken();
                                 if (matchTokens(Symbol.RIGHTPAR)) {
@@ -572,6 +593,8 @@ public class Compiler {
         if (matchTokens(Symbol.ASSIGN)) {
             lexer.nextToken();
             var.addTest(test());
+        } else {
+            var.addTest(null);
         }
 
         while (matchTokens(Symbol.COMMA)) {
@@ -581,6 +604,8 @@ public class Compiler {
             if (matchTokens(Symbol.ASSIGN)) {
                 lexer.nextToken();
                 var.addTest(test());
+            } else {
+                var.addTest(null);
             }
         }
 
@@ -995,6 +1020,7 @@ public class Compiler {
             atom.setName(name);
             lexer.nextToken();
             if (matchTokens(Symbol.LEFTPAR)) {
+                atom.setHasParameters(true);
                 atom.setParameters(parameters());
             } else if (matchTokens(Symbol.DOT)) {
                 lexer.nextToken();
@@ -1003,6 +1029,7 @@ public class Compiler {
                 atom.setFuncName(funcName);
                 lexer.nextToken();
                 if (matchTokens(Symbol.LEFTPAR)) {
+                    atom.setHasParameters(true);
                     atom.setParameters(parameters());
                 } else {
                     error.show("'(' expected after '.'");

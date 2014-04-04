@@ -16,17 +16,20 @@ public class XorExpr {
         this.andexprs.add(a);
     }
 
-    public void genC(int tabs) {
-//        String x = "";
-//        int tab = tabs;
-//        while (tabs != 0) {
-//            x = x.concat("  ");
-//            tabs--;
-//        }
-//        System.out.println(x + this.getClass().getName());
-//        for (AndExpr a : andexprs) {
-//            a.genC(tab + 1);
-//        }
+    public List<AndExpr> getAndexprs() {
+        return andexprs;
+    }
+
+    public void genC(PW pw) {
+    
+//        pw.print("(");
+        this.andexprs.get(0).genC(pw);
+        for(int i = 1; i < this.andexprs.size(); i++){
+            pw.print(" ^ ");    
+            this.andexprs.get(i).genC(pw);
+        }
+//        pw.print(")");
+
     }
 
     private List<AndExpr> andexprs;

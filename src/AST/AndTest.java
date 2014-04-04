@@ -16,17 +16,22 @@ public class AndTest {
         this.nottest.add(t);
     }
 
-    public void genC(int tabs) {
-//        String x = "";
-//        int tab = tabs;
-//        while (tabs != 0) {
-//            x = x.concat("  ");
-//            tabs--;
-//        }
-//        System.out.println(x + this.getClass().getName());
-//        for (NotTest t : nottest) {
-//            t.genC(tab + 1);
-//        }
+    public List<NotTest> getNottest() {
+        return nottest;
+    }
+    
+    
+
+    public void genC(PW pw) {
+
+//        pw.print("(");
+        this.nottest.get(0).genC(pw);
+        for(int i = 1; i < this.nottest.size(); i++){
+            pw.print(" && ");    
+            this.nottest.get(i).genC(pw);
+        }
+//        pw.print(")");
+
     }
 
     private List<NotTest> nottest;

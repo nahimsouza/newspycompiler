@@ -29,18 +29,20 @@ public class ExprStmt extends SmallStmt {
         this.listmaker = listmaker;
     }
 
-    
-    public void genC(int tabs) {
-//        String x = "";
-//        int tab = tabs;
-//        while (tabs != 0) {
-//            x = x.concat("  ");
-//            tabs--;
-//        }
-//        System.out.println(x + this.getClass().getName());
-//        targetlist.genC(tab + 1);
-//        augassign.genC(tab + 1);
-//        testlist.genC(tab + 1);
+    public void genC(PW pw) {
+        
+        /*
+            Deve imprimir algo como:
+            x += 2;
+        */
+        
+        this.targetlist.genC(pw);
+        if (this.augassign != null) {
+            this.augassign.genC(pw);
+            this.listmaker.genC(pw);
+        }
+        pw.print(";");
+        pw.println(" ");
     }
 
     private Targetlist targetlist;

@@ -46,19 +46,16 @@ public class Fpdef {
     }
 
 
-    public void genC(int tabs) {
-//        String x = "";
-//        int tab = tabs;
-//        while (tabs != 0) {
-//            x = x.concat("  ");
-//            tabs--;
-//        }
-//        System.out.println(x + this.getClass().getName());
-//        if (isName) {
-//            name.genC(tab + 1);
-//        } else {
-//            fplist.genC(tab + 1);
-//        }
+    public void genC(PW pw) {
+        if (tipo.equals("name")){
+            this.name.genC(pw);
+        } else if (tipo.equals("self")) {
+            pw.print("_class_CN *this");
+        } else if (tipo.equals("fplist")) {
+            fplist.genC(pw);
+        } else if (tipo.equals("number")) {
+            this.number.genC(pw);
+        }
     }
 
     private Name name;
