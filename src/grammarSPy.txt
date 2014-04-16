@@ -86,7 +86,7 @@ $ consideramos numeros com valor maximo 32767 (e minimo -32767), apenas pq já t
 $ conferir depois no Lexer, pois esta considerando apenas o NEQC '!=', conferir se nao dá erro qndo tem algo '!true' por exemplo
 
 $ no for_stmt, consideramos 'exprlist' como uma variável (NAME), pois em python 
-as expressoes sempre sao do tipo: 'for x in range()', onde x sempre é uma variavel.
+as expressoes sempre sao do tipo: 'for v in range(0,10)', onde x sempre é uma variavel.
 (obs: já está alterado na gramatica)
 
 $ obs GenC: o código que está no GenC é o codigo do Tomazella, precisa conferir e alterar o que for necessário

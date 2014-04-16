@@ -60,7 +60,7 @@ public class Target {
             pw.print(")");
             
         } else {
-            pw.print("this->_CN_");
+            pw.print("this->_CN");
             name.genC(pw);
         }
     }

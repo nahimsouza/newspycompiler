@@ -17,9 +17,9 @@ typedef struct _St_A {
     void _A_get(    _class_A *this    )         {
 
       return       this->_CN      _i      ;    }
-    void _A_put(    _class_A *this    ,     _p_i    )         {
+    void _A_put(    _class  _A *this    ,     _p_i    )         {
 
-      this->_CN_      _i      =      _p_i      ;       
+      this->_CN      _i      =      _p_i      ;       
     }
   }
   
@@ -43,14 +43,14 @@ typedef struct _St_B {
 	Func *vt; 
 	} _class_B;  
 
-	class_B *new_A(void); 
+	class_B *new_B(void); 
      {
 
     _num    =    0.0    ;     
     _a    =    _A    (    )    ;     
     void _B_put(    _class_B *this    ,     _n    )         {
 
-      this->_CN_      _num      =      _n      ;       
+      this->_CN      _num      =      _n      ;       
       _a      ->vt[      _put      ]      (      _a      ,       _n      )      ;       
     }
     void _B_write(    _class_B *this    )         {
@@ -59,7 +59,7 @@ typedef struct _St_B {
     }
     void _B_inc(    _class_B *this    )         {
 
-      this->_CN_      _num      +=      this->_CN      _num      ;       
+      this->_CN      _num      +=      this->_CN      _num      ;       
     }
     void _B_getNum(    _class_B *this    )         {
 
